@@ -1,0 +1,20 @@
+{
+  "name": "talis-node",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "cd persona && npm test && cd ../echo && npm test && cd ../babel && npm test && cd ..",
+    "postinstall": "cd persona && npm install && cd ../echo && npm install && cd ../babel && npm install && cd .. && npm install -g grunt-cli"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/talis/talis-node.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/talis/talis-node/issues"
+  },
+  "homepage": "https://github.com/talis/talis-node#readme"
+}
