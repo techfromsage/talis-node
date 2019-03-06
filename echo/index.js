@@ -102,14 +102,17 @@ function Client() {
  * @callback callback
  */
   function parseJSON(body, callback) {
+    var jsonBody;
     try {
-      var jsonBody = JSON.parse(body);
-      callback(null, jsonBody);
+      jsonBody = JSON.parse(body);
     } catch (e) {
       var errText = 'Error parsing returned JSON';
       error(errText);
       callback(errText);
+      return;
     }
+    callback(null, jsonBody);
+    return;
   }
 
   /**

@@ -105,7 +105,8 @@ describe("Echo Node Client Test Suite", function(){
                 echo_endpoint: endPoint
             });
 
-            var requestStub = sandbox.stub(request, 'post', function (options, callback) {
+            var requestStub = sandbox.stub(request, 'post')
+            requestStub.callsFake(function (options, callback) {
                 if(!options.body){
                     var error = new Error('Missing field: options.body');
                     callback(error);
@@ -124,7 +125,8 @@ describe("Echo Node Client Test Suite", function(){
                 echo_endpoint: endPoint
             });
 
-            var requestStub = sandbox.stub(request, 'post', function (options, callback) {
+            var requestStub = sandbox.stub(request, 'post')
+            requestStub.callsFake(function (options, callback) {
                 if(!options.method){
                     var error = new Error('Missing field: options.method');
                     callback(error);
@@ -143,7 +145,8 @@ describe("Echo Node Client Test Suite", function(){
                 echo_endpoint: endPoint
             });
 
-            var requestStub = sandbox.stub(request, 'post', function (options, callback) {
+            var requestStub = sandbox.stub(request, 'post')
+            requestStub.callsFake(function (options, callback) {
                 if(options.method !== 'POST'){
                     var error = new Error('Invalid field: options.method');
                     callback(error);
@@ -162,7 +165,8 @@ describe("Echo Node Client Test Suite", function(){
                 echo_endpoint: endPoint
             });
 
-            var requestStub = sandbox.stub(request, 'post', function (options, callback) {
+            var requestStub = sandbox.stub(request, 'post')
+            requestStub.callsFake(function (options, callback) {
                 if(!options.json){
                     var error = new Error('Missing field: options.json');
                     callback(error);
@@ -181,7 +185,8 @@ describe("Echo Node Client Test Suite", function(){
                 echo_endpoint: endPoint
             });
 
-            var requestStub = sandbox.stub(request, 'post', function (options, callback) {
+            var requestStub = sandbox.stub(request, 'post')
+            requestStub.callsFake(function (options, callback) {
                 callback(
                   null,
                   {statusCode: 200},
@@ -282,7 +287,8 @@ describe("Echo Node Client Test Suite", function(){
                 echo_endpoint: endPoint
             });
 
-            var requestStub = sandbox.stub(request, 'get', function(options, callback) {
+            var requestStub = sandbox.stub(request, 'get')
+            requestStub.callsFake(function (options, callback) {
                 var data = "{\"head\": {\"type\": \"sum\",\"class\": \"player.timer.2\",\"property\": \"interval_with_decay\",\"group_by\": \"user\",\"filter\": {\"module_id\": \"5847ed0ef81ebd1f1b000001\",\"resource_id\": \"5899a87fd42410f2c9000001\"},\"from\": \"2016-08-29T00:00:00\",\"to\": \"2017-05-18T00:00:00\",\"count\": 2},\"results\": [{\"user\": \"8av3Jaj__vC9v9VIY_P-1w\",\"interval_with_decay\": 182920},{\"user\": \"d17T05nNTjG50sAp_R3RvQ\",\"interval_with_decay\": 21315}]}";
                 callback(null, {statusCode: 200}, data);
             });
@@ -329,7 +335,8 @@ describe("Echo Node Client Test Suite", function(){
                 echo_endpoint: endPoint
             });
 
-            var requestStub = sandbox.stub(request, 'get', function(options, callback) {
+            var requestStub = sandbox.stub(request, 'get')
+            requestStub.callsFake(function (options, callback) {
                 callback(new Error('Error communicating with Echo'));
             });
 
@@ -354,7 +361,8 @@ describe("Echo Node Client Test Suite", function(){
                 echo_endpoint: endPoint
             });
 
-            var requestStub = sandbox.stub(request, 'get', function(options, callback) {
+            var requestStub = sandbox.stub(request, 'get')
+            requestStub.callsFake(function (options, callback) {
                 var data = "{\"head\": {\"type\": \"sum\",\"class\": \"player.timer.2\",\"property\": \"interval_with_decay\",\"group_by\": \"user\",\"filter\": {\"module_id\": \"5847ed0ef81ebd1f1b000001\"},\"user\": {\"exclude\": \"qVyfsQhlMY0T2_Bl7eotrg\"},\"from\": \"2017-02-01T00:00:00\",\"to\": \"2017-02-13T00:00:00\",\"count\": 2},\"results\": [{\"user\": \"8av3Jaj__vC9v9VIY_P-1w\",\"interval_with_decay\": 182920},{\"user\": \"d17T05nNTjG50sAp_R3RvQ\",\"interval_with_decay\": 21315}]}";
                 callback(null, {statusCode: 200}, data);
             });
@@ -393,7 +401,8 @@ describe("Echo Node Client Test Suite", function(){
                 echo_endpoint: endPoint
             });
 
-            var requestStub = sandbox.stub(request, 'get', function(options, callback) {
+            var requestStub = sandbox.stub(request, 'get')
+            requestStub.callsFake(function (options, callback) {
                 var data = "{\"head\": {\"type\": \"sum\",\"class\": \"player.timer.2\",\"property\": \"interval_with_decay\",\"group_by\": \"user\",\"filter\": {\"module_id\": \"5847ed0ef81ebd1f1b000001\"},\"user\": {\"exclude\": \"qVyfsQhlMY0T2_Bl7eotrg\"},\"from\": \"2017-02-01T00:00:00\",\"to\": \"2017-02-13T00:00:00\",\"count\": 2},\"results\": [{\"user\": \"8av3Jaj__vC9v9VIY_P-1w\",\"interval_with_decay\": 182920},{\"user\": \"d17T05nNTjG50sAp_R3RvQ\",\"interval_with_decay\": 21315}]}";
                 callback(null, {statusCode: 200}, data);
             });
@@ -413,7 +422,7 @@ describe("Echo Node Client Test Suite", function(){
                 (err === null).should.be.true;
                 requestStub.callCount.should.equal(1);
                 firstCall.args[0].method.should.equal('GET');
-                firstCall.args[0].headers.should.not.contain('cache-control');
+                firstCall.args[0].headers.should.not.have.property('cache-control');
                 (result.results instanceof Array).should.be.true;
                 result.results.length.should.equal(2);
                 result.results[0].user.should.equal('8av3Jaj__vC9v9VIY_P-1w');
@@ -434,7 +443,8 @@ describe("Echo Node Client Test Suite", function(){
 
             var data = "<html><head>Test</head></html>";
 
-            var requestStub = sandbox.stub(request, 'get', function(options, callback) {
+            var requestStub = sandbox.stub(request, 'get')
+            requestStub.callsFake(function (options, callback) {
                 callback(null, {statusCode: 200}, data);
             });
 
@@ -466,7 +476,8 @@ describe("Echo Node Client Test Suite", function(){
 
             var data = "[]";
 
-            var requestStub = sandbox.stub(request, 'get', function(options, callback) {
+            var requestStub = sandbox.stub(request, 'get')
+            requestStub.callsFake(function (options, callback) {
                 callback(null, {statusCode: 400}, data);
             });
 
@@ -498,7 +509,8 @@ describe("Echo Node Client Test Suite", function(){
 
             var data = "this is invalid";
 
-            var requestStub = sandbox.stub(request, 'get', function(options, callback) {
+            var requestStub = sandbox.stub(request, 'get')
+            requestStub.callsFake(function (options, callback) {
                 callback(null, {statusCode: 400}, data);
             });
 
@@ -522,5 +534,6 @@ describe("Echo Node Client Test Suite", function(){
                 err.should.equal('error response status code: 400');
                 done();
             });
-        });    });
+        }); 
+    });
 });

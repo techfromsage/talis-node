@@ -6,7 +6,7 @@ var jwt = require("jsonwebtoken");
 var CacheService = require("cache-service");
 var uuid = require('uuid');
 
-var clientVer = require('../package.json').version || 'unknown';
+var clientVer = require('../../package.json').version || 'unknown';
 
 var hashKey = require('./lib/hash-key');
 var validateOpts = require('./lib/validate-opts');
@@ -76,8 +76,8 @@ var PersonaClient = function (appUA, config) {
     this.pk_auto_refresh_timeout_ms = (this.config.cert_timeout_sec > 10) ? (this.config.cert_timeout_sec - 10) * 1000 : this.config.cert_timeout_sec * 1000;
 
     this.userAgent = (process && _.has(process, ["version", "env.NODE_ENV"])) ? appUA +
-        " persona-node-client/" + clientVer + " (nodejs/" + process.version + "; NODE_ENV=" +
-        process.env.NODE_ENV + ")" : appUA + " persona-node-client/" + clientVer;
+        " talis-node/" + clientVer + " (nodejs/" + process.version + "; NODE_ENV=" +
+        process.env.NODE_ENV + ")" : appUA + " talis-node/" + clientVer;
 
     // default connection config
     _.merge({
