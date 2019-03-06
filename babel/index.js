@@ -2,7 +2,7 @@
 
 var _ = require('lodash'),
     request = require('request'),
-    md5 = require('MD5'),
+    md5 = require('md5'),
     querystring = require('querystring');
 
 // log severities
