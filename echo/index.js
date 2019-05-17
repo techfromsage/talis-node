@@ -181,7 +181,7 @@ function Client() {
     debug('request options', requestOptions);
 
     request.post(requestOptions, function onResp(err, response, body) {
-      if (err || parseInt(statusCode / 100) !== 2) {
+      if (err || parseInt(response.statusCode / 100) !== 2) {
         var errorResponse = {
           message: response ? response.statusMessage : err.message,
           statusCode: response ? response.statusCode : 0
@@ -254,7 +254,7 @@ function Client() {
     debug('request options', requestOptions);
 
     request.get(requestOptions, function onResp(err, response, rawBody) {
-      if (err || parseInt(statusCode / 100) !== 2) {
+      if (err || parseInt(response.statusCode / 100) !== 2) {
         var errorResponse = {
           message: response ? response.statusMessage : err.message,
           statusCode: response ? response.statusCode : 0
