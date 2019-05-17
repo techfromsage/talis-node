@@ -259,7 +259,7 @@ function Client() {
           message: response ? response.statusMessage : err.message,
           statusCode: response ? response.statusCode : 0
         };
-        error('[echoClient] queryAnalytics error', { error: errorResponse.message, body: rawBody, statusCode: errorResponse.statusCode });
+        error('[echoClient] queryAnalytics error', { error: errorResponse.message, statusCode: errorResponse.statusCode, body: rawBody });
         callback(errorResponse);
       } else {
         parseJSON(rawBody, callback);
