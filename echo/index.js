@@ -254,13 +254,13 @@ function Client() {
     debug('request options', requestOptions);
 
     request.get(requestOptions, function onResp(err, response, rawBody) {
-      var statusCode = response && response.statusCode
-        ? response.statusCode
-        : 0;
-
       if (err || parseInt(statusCode / 100) !== 2) {
-        error('[echoClient] queryAnalytics error', { err: err, body: rawBody, statusCode: statusCode });
-        callback(err || 'error response status code: ' + statusCode);
+        var errorResponse = {
+          message: response ? response.statusMessage : err.message,
+          statusCode: response ? response.statusCode : 0
+        };
+        error('[echoClient] queryAnalytics error', { error: errorResponse.message, body: rawBody, statusCode: errorResponse.statusCode });
+        callback(errorResponse);
       } else {
         parseJSON(rawBody, callback);
       }
