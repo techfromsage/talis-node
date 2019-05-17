@@ -181,13 +181,13 @@ function Client() {
     debug('request options', requestOptions);
 
     request.post(requestOptions, function onResp(err, response, body) {
-      var statusCode = response && response.statusCode
-        ? response.statusCode
-        : 0;
-
       if (err || parseInt(statusCode / 100) !== 2) {
-        error('[echoClient] addEvents error', { err: err, body: body, statusCode: statusCode });
-        callback(err || 'error response status code: ' + statusCode);
+        var errorResponse = {
+          message: response ? response.statusMessage : err.message,
+          statusCode: response ? response.statusCode : 0
+        };
+        error('[echoClient] addEvents error', { error: errorResponse.message, statusCode: errorResponse.statusCode, body: body });
+        callback(errorResponse);
       } else {
         callback(null, body);
       }
