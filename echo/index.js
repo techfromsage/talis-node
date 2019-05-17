@@ -181,10 +181,12 @@ function Client() {
     debug('request options', requestOptions);
 
     request.post(requestOptions, function onResp(err, response, body) {
-      if (err || (response ? parseInt(response.statusCode / 100) !== 2 : false)) {
+      var statusCode = response ? response.statusCode : 0;
+      var errorMessage = response ? response.statusMessage : err
+      if (err || parseInt(statusCode / 100) !== 2) {
         var errorResponse = {
-          message: response ? response.statusMessage : err,
-          statusCode: response ? response.statusCode : 0
+          message: errorMessage,
+          statusCode: statusCode
         };
         error('[echoClient] addEvents error', { error: errorResponse.message, statusCode: errorResponse.statusCode, body: body });
         callback(errorResponse);
@@ -254,10 +256,12 @@ function Client() {
     debug('request options', requestOptions);
 
     request.get(requestOptions, function onResp(err, response, rawBody) {
-      if (err || (response ? parseInt(response.statusCode / 100) !== 2 : false)) {
+      var statusCode = response ? response.statusCode : 0;
+      var errorMessage = response ? response.statusMessage : err
+      if (err || parseInt(statusCode / 100) !== 2) {
         var errorResponse = {
-          message: response ? response.statusMessage : err,
-          statusCode: response ? response.statusCode : 0
+          message: errorMessage,
+          statusCode: statusCode
         };
         error('[echoClient] queryAnalytics error', { error: errorResponse.message, statusCode: errorResponse.statusCode, body: rawBody });
         callback(errorResponse);
