@@ -181,12 +181,17 @@ function Client() {
     debug('request options', requestOptions);
 
     request.post(requestOptions, function onResp(err, response, body) {
-      var statusCode = response ? response.statusCode : 0;
-      var errorMessage = response ? response.statusMessage : (err && err.message)
-      if (err || parseInt(statusCode / 100) !== 2) {
+      if (err) {
         var errorResponse = {
-          message: errorMessage,
-          statusCode: statusCode
+          statusCode: 0,
+          message: err.message 
+        };
+        error('[echoClient] addEvents error', { error: errorResponse.message, statusCode: errorResponse.statusCode, body: body });
+        callback(errorResponse);
+      } else if (response && parseInt(response.statusCode / 100) !== 2) {
+        var errorResponse = {
+          statusCode: response.statusCode,
+          message: response.statusMessage
         };
         error('[echoClient] addEvents error', { error: errorResponse.message, statusCode: errorResponse.statusCode, body: body });
         callback(errorResponse);
@@ -256,12 +261,17 @@ function Client() {
     debug('request options', requestOptions);
 
     request.get(requestOptions, function onResp(err, response, rawBody) {
-      var statusCode = response ? response.statusCode : 0;
-      var errorMessage = response ? response.statusMessage : (err && err.message)
-      if (err || parseInt(statusCode / 100) !== 2) {
+      if (err) {
         var errorResponse = {
-          message: errorMessage,
-          statusCode: statusCode
+          statusCode: 0,
+          message: err.message 
+        };
+        error('[echoClient] queryAnalytics error', { error: errorResponse.message, statusCode: errorResponse.statusCode, body: rawBody });
+        callback(errorResponse);
+      } else if (response && parseInt(response.statusCode / 100) !== 2) {
+        var errorResponse = {
+          statusCode: response.statusCode,
+          message: response.statusMessage
         };
         error('[echoClient] queryAnalytics error', { error: errorResponse.message, statusCode: errorResponse.statusCode, body: rawBody });
         callback(errorResponse);
