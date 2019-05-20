@@ -182,7 +182,7 @@ function Client() {
 
     request.post(requestOptions, function onResp(err, response, body) {
       var statusCode = response ? response.statusCode : 0;
-      var errorMessage = response ? response.statusMessage : err
+      var errorMessage = response ? response.statusMessage : (err && err.message)
       if (err || parseInt(statusCode / 100) !== 2) {
         var errorResponse = {
           message: errorMessage,
@@ -257,7 +257,7 @@ function Client() {
 
     request.get(requestOptions, function onResp(err, response, rawBody) {
       var statusCode = response ? response.statusCode : 0;
-      var errorMessage = response ? response.statusMessage : err
+      var errorMessage = response ? response.statusMessage : (err && err.message)
       if (err || parseInt(statusCode / 100) !== 2) {
         var errorResponse = {
           message: errorMessage,
