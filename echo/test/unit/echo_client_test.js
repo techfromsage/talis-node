@@ -498,7 +498,7 @@ describe("Echo Node Client Test Suite", function(){
                 requestStub.callCount.should.equal(1);
                 firstCall.args[0].method.should.equal('GET');
                 firstCall.args[0].headers['cache-control'].should.equal('none');
-                err.should.equal('error response status code: 400');
+                err.should.deepEqual({ statusCode: 400, message: undefined });
                 done();
             });
         });
@@ -531,7 +531,7 @@ describe("Echo Node Client Test Suite", function(){
                 requestStub.callCount.should.equal(1);
                 firstCall.args[0].method.should.equal('GET');
                 firstCall.args[0].headers['cache-control'].should.equal('none');
-                err.should.equal('error response status code: 400');
+                err.should.deepEqual({statusCode: 400, message: undefined});
                 done();
             });
         }); 

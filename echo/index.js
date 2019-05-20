@@ -193,6 +193,7 @@ function Client() {
           statusCode: response.statusCode,
           message: response.statusMessage
         };
+        console.log(`response is ${JSON.stringify(response)}`);
         error('[echoClient] addEvents error', { error: errorResponse.message, statusCode: errorResponse.statusCode, body: body });
         callback(errorResponse);
       } else {
@@ -269,6 +270,7 @@ function Client() {
         error('[echoClient] queryAnalytics error', { error: errorResponse.message, statusCode: errorResponse.statusCode, body: rawBody });
         callback(errorResponse);
       } else if (response && parseInt(response.statusCode / 100) !== 2) {
+        console.log(`response is ${JSON.stringify(response)}`);
         var errorResponse = {
           statusCode: response.statusCode,
           message: response.statusMessage
