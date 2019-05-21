@@ -186,15 +186,27 @@ function Client() {
           statusCode: 0,
           message: err.message 
         };
-        error('[echoClient] addEvents error', { error: errorResponse.message, statusCode: errorResponse.statusCode, body: body });
+        error(
+          '[echoClient] addEvents error', 
+          { 
+            error: errorResponse.message, statusCode: errorResponse.statusCode, body: body 
+          }
+        );
         callback(errorResponse);
+        return;
       } else if (response && parseInt(response.statusCode / 100) !== 2) {
         var errorResponse = {
           statusCode: response.statusCode,
           message: response.statusMessage
         };
-        error('[echoClient] addEvents error', { error: errorResponse.message, statusCode: errorResponse.statusCode, body: body });
+        error(
+          '[echoClient] addEvents error', 
+          { 
+            error: errorResponse.message, statusCode: errorResponse.statusCode, body: body
+          }
+        );
         callback(errorResponse);
+        return;
       } else {
         callback(null, body);
       }
@@ -266,15 +278,27 @@ function Client() {
           statusCode: 0,
           message: err.message 
         };
-        error('[echoClient] queryAnalytics error', { error: errorResponse.message, statusCode: errorResponse.statusCode, body: rawBody });
+        error(
+          '[echoClient] queryAnalytics error',
+          { 
+            error: errorResponse.message, statusCode: errorResponse.statusCode, body: rawBody
+          }
+        );
         callback(errorResponse);
+        return;
       } else if (response && parseInt(response.statusCode / 100) !== 2) {
         var errorResponse = {
           statusCode: response.statusCode,
           message: response.statusMessage
         };
-        error('[echoClient] queryAnalytics error', { error: errorResponse.message, statusCode: errorResponse.statusCode, body: rawBody });
+        error(
+          '[echoClient] queryAnalytics error',
+          { 
+            error: errorResponse.message, statusCode: errorResponse.statusCode, body: rawBody
+          }
+        );
         callback(errorResponse);
+        return;
       } else {
         parseJSON(rawBody, callback);
       }
