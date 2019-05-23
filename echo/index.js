@@ -2,7 +2,7 @@
 
 var request = require('request');
 var _ = require('lodash');
-var errorCodes = require("./lib/error-codes").errorCodes;
+var errorCodesAndLabels = require("./lib/error-codes").errorCodesAndLabels;
 var httpStatusToErrorCode = require("./lib/error-codes").httpStatusToErrorCode;
 
 // log severities
@@ -278,31 +278,23 @@ function Client() {
 
       if (err || parseInt(response.statusCode / 100) !== 2) {
         var errorCode;
+
         if (err) {
-          errorCode = errorCodes.REQUEST_ERROR;
+          errorCode = errorCodesAndLabels.REQUEST_ERROR;
         } else {
           errorCode = httpStatusToErrorCode[response.statusCode] === undefined
-            ? errorCodes.UNKNOWN_ERROR
+            ? errorCodesAndLabels.UNKNOWN_ERROR
             : httpStatusToErrorCode[response.statusCode];
         }
-  
-        var errorCodeLabel = errorCodes[errorCode];
+        
   
         var errorResponse = {
           code: errorCode,
-          label: errorCodeLabel,
+          label: errorCodesAndLabels[errorCode],
           detail: rawBody
         };
 
-        error(
-          '[echoClient] queryAnalytics error',
-          { 
-            code: errorCode,
-            label: errorCodeLabel,
-            detail: rawBody
-          }
-        );
-
+        error('[echoClient] queryAnalytics error', errorResponse);
         callback(errorResponse);
         return;
       } else {

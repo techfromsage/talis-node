@@ -1,4 +1,4 @@
-var errorCodes = {
+var errorCodesAndLabels = {
     REQUEST_ERROR: 1,
     1: "REQUEST_ERROR",
 
@@ -10,16 +10,20 @@ var errorCodes = {
 
     NOT_IMPLEMENTED: 4,
     4: "NOT_IMPLEMENTED",
+
+    NOT_MODIFIED: 5,
+    5: "NOT_MODIFIED",
     
     UNKNOWN_ERROR: 99,
     99: 'UNKNOWN_ERROR',
 };
 
 var httpStatusToErrorCode = {
-    400: errorCodes.INVALID_ANALYTICS_QUERY,
-    500: errorCodes.INTERNAL_ANALYTICS_ERROR,
-    501: errorCodes.NOT_IMPLEMENTED
+    304: errorCodesAndLabels.NOT_MODIFIED,
+    400: errorCodesAndLabels.INVALID_ANALYTICS_QUERY,
+    500: errorCodesAndLabels.INTERNAL_ANALYTICS_ERROR,
+    501: errorCodesAndLabels.NOT_IMPLEMENTED
 };
 
-module.exports.errorCodes = errorCodes;
+module.exports.errorCodes = errorCodesAndLabels;
 module.exports.httpStatusToErrorCode = httpStatusToErrorCode;
