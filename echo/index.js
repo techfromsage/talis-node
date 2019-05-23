@@ -273,6 +273,13 @@ function Client() {
     debug('request options', requestOptions);
 
     request.get(requestOptions, function onResp(err, response, rawBody) {
+
+      const resultCode = HttpStatusToResultCode[resp.statusCode] === undefined
+        ? ResultCode.UNKNOWN
+        : HttpStatusToResultCode[resp.statusCode];
+
+      const resultLabel = ResultCode[resultCode];
+
       if (err) {
         var errorResponse = {
           statusCode: 0,
