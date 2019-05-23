@@ -276,36 +276,33 @@ function Client() {
 
     request.get(requestOptions, function onResp(err, response, rawBody) {
 
-      const errorCode = httpStatusToErrorCode[response.statusCode] === undefined
-        ? errorCodes.UNKNOWN_ERROR
-        : httpStatusToErrorCode[response.statusCode];
-
-      const resultLabel = ResultCode[resultCode];
-
-      if (err) {
+      if (err || parseInt(response.statusCode / 100) !== 2) {
+        var errorCode;
+        if (err) {
+          errorCode = errorCodes.REQUEST_ERROR;
+        } else {
+          errorCode = httpStatusToErrorCode[response.statusCode] === undefined
+            ? errorCodes.UNKNOWN_ERROR
+            : httpStatusToErrorCode[response.statusCode];
+        }
+  
+        var errorCodeLabel = errorCodes[errorCode];
+  
         var errorResponse = {
-          statusCode: 0,
-          message: err.message 
+          code: errorCode,
+          label: errorCodeLabel,
+          detail: rawBody
         };
+
         error(
           '[echoClient] queryAnalytics error',
           { 
-            error: errorResponse.message, statusCode: errorResponse.statusCode, body: rawBody
+            code: errorCode,
+            label: errorCodeLabel,
+            detail: rawBody
           }
         );
-        callback(errorResponse);
-        return;
-      } else if (response && parseInt(response.statusCode / 100) !== 2) {
-        var errorResponse = {
-          statusCode: response.statusCode,
-          message: response.statusMessage
-        };
-        error(
-          '[echoClient] queryAnalytics error',
-          { 
-            error: errorResponse.message, statusCode: errorResponse.statusCode, body: rawBody
-          }
-        );
+
         callback(errorResponse);
         return;
       } else {
