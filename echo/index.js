@@ -183,34 +183,27 @@ function Client() {
     debug('request options', requestOptions);
 
     request.post(requestOptions, function onResp(err, response, body) {
-      if (err) {
+      if (err || parseInt(response.statusCode / 100) !== 2) {
+        var errorCode;
+
+        if (err) {
+          errorCode = errorCodesAndLabels.REQUEST_ERROR;
+        } else {
+          errorCode = httpStatusToErrorCode[response.statusCode] === undefined
+            ? errorCodesAndLabels.UNKNOWN_ERROR
+            : httpStatusToErrorCode[response.statusCode];
+        }
+  
         var errorResponse = {
-          statusCode: 0,
-          message: err.message 
+          code: errorCode,
+          label: errorCodesAndLabels[errorCode],
         };
-        error(
-          '[echoClient] addEvents error', 
-          { 
-            error: errorResponse.message, statusCode: errorResponse.statusCode, body: body 
-          }
-        );
-        callback(errorResponse);
-        return;
-      } else if (response && parseInt(response.statusCode / 100) !== 2) {
-        var errorResponse = {
-          statusCode: response.statusCode,
-          message: response.statusMessage
-        };
-        error(
-          '[echoClient] addEvents error', 
-          { 
-            error: errorResponse.message, statusCode: errorResponse.statusCode, body: body
-          }
-        );
+
+        error('[echoClient] addEvents error', errorResponse);
         callback(errorResponse);
         return;
       } else {
-        callback(null, body);
+        callback(null, {code: 0, label: "SUCCESS"});
       }
     });
   };
@@ -275,7 +268,6 @@ function Client() {
     debug('request options', requestOptions);
 
     request.get(requestOptions, function onResp(err, response, rawBody) {
-
       if (err || parseInt(response.statusCode / 100) !== 2) {
         var errorCode;
 
@@ -286,19 +278,17 @@ function Client() {
             ? errorCodesAndLabels.UNKNOWN_ERROR
             : httpStatusToErrorCode[response.statusCode];
         }
-        
   
         var errorResponse = {
           code: errorCode,
           label: errorCodesAndLabels[errorCode],
-          detail: rawBody
         };
 
         error('[echoClient] queryAnalytics error', errorResponse);
         callback(errorResponse);
         return;
       } else {
-        parseJSON(rawBody, callback);
+        parseJSON({code: 0, label: "SUCCESS"}, callback);
       }
     });
   };
