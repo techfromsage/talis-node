@@ -183,15 +183,16 @@ function Client() {
     debug('request options', requestOptions);
 
     request.post(requestOptions, function onResp(err, response, body) {
-      if (err || parseInt(response.statusCode / 100) !== 2) {
+      var statusCode = response && response.statusCode ? response.statusCode : 0;
+      if (err || parseInt(statusCode / 100) !== 2) {
         var errorCode;
 
         if (err) {
           errorCode = errorCodesAndLabels.REQUEST_ERROR;
         } else {
-          errorCode = httpStatusToErrorCode[response.statusCode] === undefined
+          errorCode = httpStatusToErrorCode[statusCode] === undefined
             ? errorCodesAndLabels.UNKNOWN_ERROR
-            : httpStatusToErrorCode[response.statusCode];
+            : httpStatusToErrorCode[statusCode];
         }
   
         var errorResponse = {
@@ -203,7 +204,8 @@ function Client() {
         callback(errorResponse);
         return;
       } else {
-        callback(null, {code: 0, label: "SUCCESS"});
+        delete body.statusCode;
+        callback(null, {code: 0, label: "SUCCESS", body: body});
       }
     });
   };
@@ -268,15 +270,16 @@ function Client() {
     debug('request options', requestOptions);
 
     request.get(requestOptions, function onResp(err, response, rawBody) {
-      if (err || parseInt(response.statusCode / 100) !== 2) {
+      var statusCode = response && response.statusCode ? response.statusCode : 0;
+      if (err || parseInt(statusCode / 100) !== 2) {
         var errorCode;
 
         if (err) {
           errorCode = errorCodesAndLabels.REQUEST_ERROR;
         } else {
-          errorCode = httpStatusToErrorCode[response.statusCode] === undefined
+          errorCode = httpStatusToErrorCode[statusCode] === undefined
             ? errorCodesAndLabels.UNKNOWN_ERROR
-            : httpStatusToErrorCode[response.statusCode];
+            : httpStatusToErrorCode[statusCode];
         }
   
         var errorResponse = {
@@ -288,7 +291,8 @@ function Client() {
         callback(errorResponse);
         return;
       } else {
-        parseJSON({code: 0, label: "SUCCESS"}, callback);
+        delete rawBody.statusCode;
+        parseJSON({code: 0, label: "SUCCESS", body: rawBody}, callback);
       }
     });
   };

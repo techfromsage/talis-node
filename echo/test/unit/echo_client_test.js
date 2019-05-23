@@ -95,7 +95,8 @@ describe("Echo Node Client Test Suite", function(){
 
             echoClient.addEvents('secret', {class:'class', source:'source'}, function(err, result){
                 (err === null).should.be.false;
-                err.message.should.equal('Error communicating with Echo');
+                err.code.should.equal(1);
+                err.label.should.equal('REQUEST_ERROR');
                 (typeof result).should.equal('undefined');
                 done();
             });
