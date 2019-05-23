@@ -1,4 +1,4 @@
-const ErrorCodes = {
+var errorCodes = {
     INVALID_ANALYTICS_QUERY: 0,
     0: "INVALID_ANALYTICS_QUERY",
 
@@ -12,11 +12,11 @@ const ErrorCodes = {
     99: 'UNKNOWN_ERROR',
 };
 
-const HttpStatusToErrorCode = {
-    400: ErrorCodes.INVALID_ANALYTICS_QUERY,
-    500: ErrorCodes.INTERNAL_ANALYTICS_ERROR,
-    501: ErrorCodes.NOT_IMPLEMENTED
+var httpStatusToErrorCode = {
+    400: errorCodes.INVALID_ANALYTICS_QUERY,
+    500: errorCodes.INTERNAL_ANALYTICS_ERROR,
+    501: errorCodes.NOT_IMPLEMENTED
 };
 
-module.exports.ErrorCodes = ErrorCodes;
-module.exports.HttpStatusToErrorCode = HttpStatusToErrorCode;
+module.exports.errorCodes = errorCodes;
+module.exports.httpStatusToErrorCode = httpStatusToErrorCode;

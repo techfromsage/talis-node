@@ -2,6 +2,8 @@
 
 var request = require('request');
 var _ = require('lodash');
+var errorCodes = require("./lib/error-codes").errorCodes;
+var httpStatusToErrorCode = require("./lib/error-codes").httpStatusToErrorCode;
 
 // log severities
 var DEBUG = 'debug';
@@ -274,9 +276,9 @@ function Client() {
 
     request.get(requestOptions, function onResp(err, response, rawBody) {
 
-      const resultCode = HttpStatusToResultCode[resp.statusCode] === undefined
-        ? ResultCode.UNKNOWN
-        : HttpStatusToResultCode[resp.statusCode];
+      const errorCode = httpStatusToErrorCode[response.statusCode] === undefined
+        ? errorCodes.UNKNOWN_ERROR
+        : httpStatusToErrorCode[response.statusCode];
 
       const resultLabel = ResultCode[resultCode];
 
