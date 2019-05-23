@@ -1,4 +1,4 @@
-module.exports.ErrorCode = {
+const ErrorCodes = {
     INVALID_ANALYTICS_QUERY: 0,
     0: "INVALID_ANALYTICS_QUERY",
 
@@ -12,8 +12,11 @@ module.exports.ErrorCode = {
     99: 'UNKNOWN_ERROR',
 };
 
-module.exports.HttpStatusToErrorCode = {
-    400: ResultCode.INVALID_ANALYTICS_QUERY,
-    500: ResultCode.INTERNAL_ANALYTICS_ERROR,
-    501: ResultCode.NOT_IMPLEMENTED
+const HttpStatusToErrorCode = {
+    400: ErrorCodes.INVALID_ANALYTICS_QUERY,
+    500: ErrorCodes.INTERNAL_ANALYTICS_ERROR,
+    501: ErrorCodes.NOT_IMPLEMENTED
 };
+
+module.exports.ErrorCodes = ErrorCodes;
+module.exports.HttpStatusToErrorCode = HttpStatusToErrorCode;
