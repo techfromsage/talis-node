@@ -121,15 +121,13 @@ function Client() {
 
 
   var getErrorCode = function (err, statusCode) {
-    var errorCode;
     if (err) {
-      errorCode = errorCodesAndLabels.REQUEST_ERROR;
+      return errorCodesAndLabels.REQUEST_ERROR;
     } else if (httpStatusToErrorCode[statusCode]) {
-      errorCode = httpStatusToErrorCode[statusCode];
+      return httpStatusToErrorCode[statusCode];
     } else {
-      errorCode = errorCodesAndLabels.UNKNOWN_ERROR;
+      return errorCodesAndLabels.UNKNOWN_ERROR;
     }
-    return errorCode;
   }
 
   /**
