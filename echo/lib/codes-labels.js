@@ -16,6 +16,9 @@ var codesAndLabels = {
 
     NOT_MODIFIED: 5,
     5: "NOT_MODIFIED",
+
+    UNAUTHORIZED: 6,
+    6: "UNAUTHORIZED",
     
     UNKNOWN_ERROR: 99,
     99: 'UNKNOWN_ERROR',
@@ -24,6 +27,7 @@ var codesAndLabels = {
 var httpStatusToCode = {
     304: codesAndLabels.NOT_MODIFIED,
     400: codesAndLabels.INVALID_QUERY,
+    401: codesAndLabels.UNAUTHORIZED,
     500: codesAndLabels.INTERNAL_ERROR,
     501: codesAndLabels.NOT_IMPLEMENTED
 };
