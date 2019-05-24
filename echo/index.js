@@ -2,8 +2,8 @@
 
 var request = require('request');
 var _ = require('lodash');
-var errorCodesAndLabels = require("./lib/error-codes").errorCodesAndLabels;
-var httpStatusToErrorCode = require("./lib/error-codes").httpStatusToErrorCode;
+var codesAndLabels = require('./lib/codes-labels').codesAndLabels;
+var httpStatusToCode = require('./lib/codes-labels').httpStatusToCode;
 
 // log severities
 var DEBUG = 'debug';
@@ -122,12 +122,11 @@ function Client() {
 
   var getErrorCode = function (err, statusCode) {
     if (err) {
-      return errorCodesAndLabels.REQUEST_ERROR;
-    } else if (httpStatusToErrorCode[statusCode]) {
-      return httpStatusToErrorCode[statusCode];
-    } else {
-      return errorCodesAndLabels.UNKNOWN_ERROR;
+      return codesAndLabels.REQUEST_ERROR;
+    } else if (httpStatusToCode[statusCode]) {
+      return httpStatusToCode[statusCode];
     }
+    return codesAndLabels.UNKNOWN_ERROR;
   }
 
   /**
@@ -202,7 +201,7 @@ function Client() {
 
         var errorResponse = {
           code: errorCode.toString(),
-          label: errorCodesAndLabels[errorCode],
+          label: codesAndLabels[errorCode],
         };
 
         error('[echoClient] addEvents error', errorResponse);
@@ -281,7 +280,7 @@ function Client() {
   
         var errorResponse = {
           code: errorCode.toString(),
-          label: errorCodesAndLabels[errorCode],
+          label: codesAndLabels[errorCode],
         };
 
         error('[echoClient] queryAnalytics error', errorResponse);
