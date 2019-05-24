@@ -95,7 +95,7 @@ describe("Echo Node Client Test Suite", function(){
 
             echoClient.addEvents('secret', {class:'class', source:'source'}, function(err, result){
                 (err === null).should.be.false;
-                err.code.should.equal("1");
+                err.code.should.equal(1);
                 err.label.should.equal('REQUEST_ERROR');
                 (typeof result).should.equal('undefined');
                 done();
@@ -352,7 +352,7 @@ describe("Echo Node Client Test Suite", function(){
                 firstCall.args[0].method.should.equal('GET');
                 firstCall.args[0].url.should.equal(endPoint + '/1/analytics/sum?class=testclass');
                 firstCall.args[0].headers['cache-control'].should.equal('none');
-                err.code.should.equal("1");
+                err.code.should.equal(1);
                 err.label.should.equal('REQUEST_ERROR');
                 (typeof result).should.equal('undefined');
                 done();
@@ -500,7 +500,7 @@ describe("Echo Node Client Test Suite", function(){
                 requestStub.callCount.should.equal(1);
                 firstCall.args[0].method.should.equal('GET');
                 firstCall.args[0].headers['cache-control'].should.equal('none');
-                err.should.deepEqual({ code: "2", label: "INVALID_QUERY"});
+                err.should.deepEqual({ code: 2, label: "INVALID_QUERY"});
                 done();
             });
         });
@@ -533,7 +533,7 @@ describe("Echo Node Client Test Suite", function(){
                 requestStub.callCount.should.equal(1);
                 firstCall.args[0].method.should.equal('GET');
                 firstCall.args[0].headers['cache-control'].should.equal('none');
-                err.should.deepEqual({ code: "2", label: "INVALID_QUERY"});
+                err.should.deepEqual({ code: 2, label: "INVALID_QUERY"});
                 done();
             });
         }); 
