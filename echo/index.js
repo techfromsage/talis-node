@@ -196,7 +196,7 @@ function Client() {
         }
   
         var errorResponse = {
-          code: errorCode,
+          code: errorCode.toString(),
           label: errorCodesAndLabels[errorCode],
         };
 
@@ -283,7 +283,7 @@ function Client() {
         }
   
         var errorResponse = {
-          code: errorCode,
+          code: errorCode.toString(),
           label: errorCodesAndLabels[errorCode],
         };
 
