@@ -200,7 +200,7 @@ function Client() {
         var errorCode = getErrorCode(err, statusCode);
 
         var errorResponse = {
-          code: errorCode.toString(),
+          code: errorCode,
           label: codesAndLabels[errorCode],
         };
 
@@ -209,7 +209,7 @@ function Client() {
         return;
       } else {
         delete body.statusCode;
-        callback(null, {"code": "0", "label": "SUCCESS", body: body});
+        callback(null, {"code": codesAndLabels.SUCCESS, "label": codesAndLabels[codesAndLabels.SUCCESS], body: body});
       }
     });
   };
@@ -279,7 +279,7 @@ function Client() {
         var errorCode = getErrorCode(err, statusCode);
   
         var errorResponse = {
-          code: errorCode.toString(),
+          code: errorCode,
           label: codesAndLabels[errorCode],
         };
 
@@ -296,7 +296,7 @@ function Client() {
           callback("Error parsing returned JSON");
           return;
         }
-        callback(null, {"code": "0", "label": "SUCCESS", "body": body});
+        callback(null, {"code": codesAndLabels.SUCCESS, "label": codesAndLabels[codesAndLabels.SUCCESS], "body": body});
       }
     });
   };
