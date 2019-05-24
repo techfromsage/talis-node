@@ -205,7 +205,7 @@ function Client() {
         return;
       } else {
         delete body.statusCode;
-        callback(null, {code: 0, label: "SUCCESS", body: body});
+        callback(null, {"code": "0", "label": "SUCCESS", body: body});
       }
     });
   };
@@ -292,7 +292,15 @@ function Client() {
         return;
       } else {
         delete rawBody.statusCode;
-        parseJSON({code: 0, label: "SUCCESS", body: rawBody}, callback);
+        var body;
+        try {
+          body = JSON.parse(rawBody);
+        } catch (exception) {
+          error("Error parsing returned JSON", exception);
+          callback("Error parsing returned JSON");
+          return;
+        }
+        callback(null, {"code": "0", "label": "SUCCESS", "body": body});
       }
     });
   };
