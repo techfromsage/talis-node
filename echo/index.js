@@ -119,12 +119,16 @@ function Client() {
     return;
   }
 
-
-  var getErrorCode = function (err, statusCode) {
+  /**
+   * Return error code based on http status code
+   * @param err 
+   * @param {number} httpStatusCode 
+   */
+  function getCodeFromHttpStatusCode(err, httpStatusCode) {
     if (err) {
       return codesAndLabels.REQUEST_ERROR;
-    } else if (httpStatusToCode[statusCode]) {
-      return httpStatusToCode[statusCode];
+    } else if (httpStatusToCode[httpStatusCode]) {
+      return httpStatusToCode[httpStatusCode];
     }
     return codesAndLabels.UNKNOWN_ERROR;
   }
@@ -197,7 +201,7 @@ function Client() {
     request.post(requestOptions, function onResp(err, response, body) {
       var statusCode = response && response.statusCode ? response.statusCode : 0;
       if (err || parseInt(statusCode / 100) !== 2) {
-        var errorCode = getErrorCode(err, statusCode);
+        var errorCode = getCodeFromHttpStatusCode(err, statusCode);
 
         var errorResponse = {
           code: errorCode,
@@ -276,7 +280,7 @@ function Client() {
     request.get(requestOptions, function onResp(err, response, rawBody) {
       var statusCode = response && response.statusCode ? response.statusCode : 0;
       if (err || parseInt(statusCode / 100) !== 2) {
-        var errorCode = getErrorCode(err, statusCode);
+        var errorCode = getCodeFromHttpStatusCode(err, statusCode);
   
         var errorResponse = {
           code: errorCode,
