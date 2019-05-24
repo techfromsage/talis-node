@@ -61,6 +61,8 @@ function queryStringParams(params) {
   return { errors: paramErrors, queryString: queryString };
 }
 
+
+
 function Client() {
   var config = {};
 
@@ -115,6 +117,19 @@ function Client() {
     }
     callback(null, jsonBody);
     return;
+  }
+
+
+  var getErrorCode = function (err, statusCode) {
+    var errorCode;
+    if (err) {
+      errorCode = errorCodesAndLabels.REQUEST_ERROR;
+    } else if (httpStatusToErrorCode[statusCode]) {
+      errorCode = httpStatusToErrorCode[statusCode];
+    } else {
+      errorCode = errorCodesAndLabels.UNKNOWN_ERROR;
+    }
+    return errorCode;
   }
 
   /**
@@ -185,16 +200,8 @@ function Client() {
     request.post(requestOptions, function onResp(err, response, body) {
       var statusCode = response && response.statusCode ? response.statusCode : 0;
       if (err || parseInt(statusCode / 100) !== 2) {
-        var errorCode;
+        var errorCode = getErrorCode(err, statusCode);
 
-        if (err) {
-          errorCode = errorCodesAndLabels.REQUEST_ERROR;
-        } else {
-          errorCode = httpStatusToErrorCode[statusCode] === undefined
-            ? errorCodesAndLabels.UNKNOWN_ERROR
-            : httpStatusToErrorCode[statusCode];
-        }
-  
         var errorResponse = {
           code: errorCode.toString(),
           label: errorCodesAndLabels[errorCode],
@@ -272,15 +279,7 @@ function Client() {
     request.get(requestOptions, function onResp(err, response, rawBody) {
       var statusCode = response && response.statusCode ? response.statusCode : 0;
       if (err || parseInt(statusCode / 100) !== 2) {
-        var errorCode;
-
-        if (err) {
-          errorCode = errorCodesAndLabels.REQUEST_ERROR;
-        } else {
-          errorCode = httpStatusToErrorCode[statusCode] === undefined
-            ? errorCodesAndLabels.UNKNOWN_ERROR
-            : httpStatusToErrorCode[statusCode];
-        }
+        var errorCode = getErrorCode(err, statusCode);
   
         var errorResponse = {
           code: errorCode.toString(),
