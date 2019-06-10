@@ -17,19 +17,40 @@ var codesAndLabels = {
     NOT_MODIFIED: 5,
     5: "NOT_MODIFIED",
 
-    UNAUTHORIZED: 6,
-    6: "UNAUTHORIZED",
+    UNAUTHORISED: 6,
+    6: "UNAUTHORISED",
+
+    INSUFFICIENT_SCOPE: 7,
+    7: "INSUFFICIENT_SCOPE",
+
+    INVALID_TOKEN: 8,
+    8: "INVALID_TOKEN",
     
     UNKNOWN_ERROR: 99,
     99: 'UNKNOWN_ERROR',
 };
 
-var httpStatusToCode = {
-    304: codesAndLabels.NOT_MODIFIED,
-    400: codesAndLabels.INVALID_QUERY,
-    401: codesAndLabels.UNAUTHORIZED,
-    500: codesAndLabels.INTERNAL_ERROR,
-    501: codesAndLabels.NOT_IMPLEMENTED
+var httpStatusToCode = function(httpStatusCode, responseBody) {
+    switch (httpStatusCode) {
+        case 304: 
+            return codesAndLabels.NOT_MODIFIED;
+        case 400: 
+            return codesAndLabels.INVALID_QUERY;
+        case 401:
+            if (responseBody.error === "invalid_token") {
+                return codesAndLabels.INVALID_TOKEN;
+            } else {
+                return codesAndLabels.UNAUTHORISED;
+            }
+        case 403:
+            return codesAndLabels.INSUFFICIENT_SCOPE;
+        case 500:
+            return codesAndLabels.INTERNAL_ERROR;
+        case 501:
+            return codesAndLabels.NOT_IMPLEMENTED;
+        default:
+            return codesAndLabels.UNKNOWN_ERROR;
+    }
 };
 
 module.exports.codesAndLabels = codesAndLabels;
