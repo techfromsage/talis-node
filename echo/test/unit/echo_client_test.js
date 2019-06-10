@@ -203,8 +203,8 @@ describe("Echo Node Client Test Suite", function(){
                 err.code.should.equal(8);
                 err.label.should.equal("INVALID_TOKEN");
                 done();
-            })
-        })
+            });
+        });
         it("- add events should return no errors if everything is successful", function(done){
             var echoClient = echo.createClient({
                 echo_endpoint: endPoint
@@ -379,6 +379,34 @@ describe("Echo Node Client Test Suite", function(){
                 err.code.should.equal(1);
                 err.label.should.equal('REQUEST_ERROR');
                 (typeof result).should.equal('undefined');
+                done();
+            });
+        });
+        it(" - should throw an error if persona validation fails", function(done) {
+            var echoClient = echo.createClient({
+                echo_endpoint: endPoint
+            });
+
+            var params = {
+                class: 'testclass'
+            };
+
+            var requestStub = sandbox.stub(request, 'get')
+            requestStub.callsFake(function (options, callback) {
+                callback(
+                  null,
+                  {statusCode: 401},
+                  {
+                      "error": "invalid_token"
+                  }
+              );
+            });
+
+            echoClient.queryAnalytics("incorrect_token", "sum", params, false, function(err, result) {
+                (err === null).should.be.false;
+
+                err.code.should.equal(8);
+                err.label.should.equal("INVALID_TOKEN");
                 done();
             });
         });
