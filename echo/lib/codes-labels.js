@@ -31,35 +31,26 @@ var codesAndLabels = {
 };
 
 var httpStatusToCode = function(httpStatusCode, responseBody) {
-    var code;
     switch (httpStatusCode) {
         case 304: 
-            code = codesAndLabels.NOT_MODIFIED;
-            break;
+            return codesAndLabels.NOT_MODIFIED;
         case 400: 
-            code = codesAndLabels.INVALID_QUERY;
-            break;
+            return codesAndLabels.INVALID_QUERY;
         case 401:
             if (responseBody.error === "invalid_token") {
-                code = codesAndLabels.INVALID_TOKEN;
+                return codesAndLabels.INVALID_TOKEN;
             } else {
-                code = codesAndLabels.UNAUTHORISED;
+                return codesAndLabels.UNAUTHORISED;
             }
-            break;
         case 403:
-            code = codesAndLabels.INSUFFICIENT_SCOPE;
-            break;
+            return codesAndLabels.INSUFFICIENT_SCOPE;
         case 500:
-            code = codesAndLabels.INTERNAL_ERROR;
-            break;
+            return codesAndLabels.INTERNAL_ERROR;
         case 501:
-            code = codesAndLabels.NOT_IMPLEMENTED;
-            break;
+            return codesAndLabels.NOT_IMPLEMENTED;
         default:
-            code = codesAndLabels.UNKNOWN_ERROR;
-            break;
+            return codesAndLabels.UNKNOWN_ERROR;
     }
-    return code;
 };
 
 module.exports.codesAndLabels = codesAndLabels;

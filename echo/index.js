@@ -129,6 +129,8 @@ function Client() {
       return codesAndLabels.REQUEST_ERROR;
     } else if (httpStatusToCode(httpStatusCode, responseBody)) {
       return httpStatusToCode(httpStatusCode, responseBody);
+    } else {
+      return codesAndLabels.UNKNOWN_ERROR;
     }
   }
 
