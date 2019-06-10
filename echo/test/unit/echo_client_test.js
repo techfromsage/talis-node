@@ -181,6 +181,30 @@ describe("Echo Node Client Test Suite", function(){
                 done();
             });
         });
+        it(" - should throw an error if persona validation fails", function(done) {
+            var echoClient = echo.createClient({
+                echo_endpoint: endPoint
+            });
+
+            var requestStub = sandbox.stub(request, 'post')
+            requestStub.callsFake(function (options, callback) {
+                callback(
+                  null,
+                  {statusCode: 401},
+                  {
+                      "error": "invalid_token"
+                  }
+              );
+            });
+
+            echoClient.addEvents("incorrect_token", {class:'class', source:'source'}, function(err, result) {
+                (err === null).should.be.false;
+
+                err.code.should.equal(8);
+                err.label.should.equal("INVALID_TOKEN");
+                done();
+            })
+        })
         it("- add events should return no errors if everything is successful", function(done){
             var echoClient = echo.createClient({
                 echo_endpoint: endPoint
