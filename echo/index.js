@@ -2,6 +2,8 @@
 
 var request = require('request');
 var _ = require('lodash');
+var codesAndLabels = require('./lib/codes-labels').codesAndLabels;
+var httpStatusToCode = require('./lib/codes-labels').httpStatusToCode;
 
 // log severities
 var DEBUG = 'debug';
@@ -59,6 +61,8 @@ function queryStringParams(params) {
   return { errors: paramErrors, queryString: queryString };
 }
 
+
+
 function Client() {
   var config = {};
 
@@ -113,6 +117,20 @@ function Client() {
     }
     callback(null, jsonBody);
     return;
+  }
+
+  /**
+   * Return error code based on http status code
+   * @param err 
+   * @param {number} httpStatusCode 
+   */
+  function getCodeFromHttpStatusCode(err, httpStatusCode) {
+    if (err) {
+      return codesAndLabels.REQUEST_ERROR;
+    } else if (httpStatusToCode[httpStatusCode]) {
+      return httpStatusToCode[httpStatusCode];
+    }
+    return codesAndLabels.UNKNOWN_ERROR;
   }
 
   /**
@@ -181,15 +199,21 @@ function Client() {
     debug('request options', requestOptions);
 
     request.post(requestOptions, function onResp(err, response, body) {
-      var statusCode = response && response.statusCode
-        ? response.statusCode
-        : 0;
-
+      var statusCode = response && response.statusCode ? response.statusCode : 0;
       if (err || parseInt(statusCode / 100) !== 2) {
-        error('[echoClient] addEvents error', { err: err, body: body, statusCode: statusCode });
-        callback(err || 'error response status code: ' + statusCode);
+        var errorCode = getCodeFromHttpStatusCode(err, statusCode);
+
+        var errorResponse = {
+          code: errorCode,
+          label: codesAndLabels[errorCode],
+        };
+
+        error('[echoClient] addEvents error', errorResponse);
+        callback(errorResponse);
+        return;
       } else {
-        callback(null, body);
+        delete body.statusCode;
+        callback(null, {"code": codesAndLabels.SUCCESS, "label": codesAndLabels[codesAndLabels.SUCCESS], body: body});
       }
     });
   };
@@ -254,15 +278,29 @@ function Client() {
     debug('request options', requestOptions);
 
     request.get(requestOptions, function onResp(err, response, rawBody) {
-      var statusCode = response && response.statusCode
-        ? response.statusCode
-        : 0;
-
+      var statusCode = response && response.statusCode ? response.statusCode : 0;
       if (err || parseInt(statusCode / 100) !== 2) {
-        error('[echoClient] queryAnalytics error', { err: err, body: rawBody, statusCode: statusCode });
-        callback(err || 'error response status code: ' + statusCode);
+        var errorCode = getCodeFromHttpStatusCode(err, statusCode);
+  
+        var errorResponse = {
+          code: errorCode,
+          label: codesAndLabels[errorCode],
+        };
+
+        error('[echoClient] queryAnalytics error', errorResponse);
+        callback(errorResponse);
+        return;
       } else {
-        parseJSON(rawBody, callback);
+        delete rawBody.statusCode;
+        var body;
+        try {
+          body = JSON.parse(rawBody);
+        } catch (exception) {
+          error("Error parsing returned JSON", exception);
+          callback("Error parsing returned JSON");
+          return;
+        }
+        callback(null, {"code": codesAndLabels.SUCCESS, "label": codesAndLabels[codesAndLabels.SUCCESS], "body": body});
       }
     });
   };

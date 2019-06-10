@@ -95,7 +95,8 @@ describe("Echo Node Client Test Suite", function(){
 
             echoClient.addEvents('secret', {class:'class', source:'source'}, function(err, result){
                 (err === null).should.be.false;
-                err.message.should.equal('Error communicating with Echo');
+                err.code.should.equal(1);
+                err.label.should.equal('REQUEST_ERROR');
                 (typeof result).should.equal('undefined');
                 done();
             });
@@ -206,11 +207,11 @@ describe("Echo Node Client Test Suite", function(){
 
                 (err === null).should.be.true;
 
-                result.timestamp.should.equal(1324524509);
-                result.user.should.equal("1234-5678-9012-3456");
-                result.source.should.equal("rl-app");
-                result.props.should.be.an.object;
-                result.props.url.should.equal("https://foo.bar/baz.html");
+                result.body.timestamp.should.equal(1324524509);
+                result.body.user.should.equal("1234-5678-9012-3456");
+                result.body.source.should.equal("rl-app");
+                result.body.props.should.be.an.object;
+                result.body.props.url.should.equal("https://foo.bar/baz.html");
 
                 done();
             });
@@ -351,7 +352,8 @@ describe("Echo Node Client Test Suite", function(){
                 firstCall.args[0].method.should.equal('GET');
                 firstCall.args[0].url.should.equal(endPoint + '/1/analytics/sum?class=testclass');
                 firstCall.args[0].headers['cache-control'].should.equal('none');
-                err.message.should.equal('Error communicating with Echo');
+                err.code.should.equal(1);
+                err.label.should.equal('REQUEST_ERROR');
                 (typeof result).should.equal('undefined');
                 done();
             });
@@ -383,16 +385,16 @@ describe("Echo Node Client Test Suite", function(){
                 requestStub.callCount.should.equal(1);
                 firstCall.args[0].method.should.equal('GET');
                 firstCall.args[0].headers['cache-control'].should.equal('none');
-                (result.results instanceof Array).should.be.true;
-                result.results.length.should.equal(2);
-                result.results[0].user.should.equal('8av3Jaj__vC9v9VIY_P-1w');
-                result.head.class.should.equal(params.class);
-                result.head.property.should.equal(params.property);
-                result.head.group_by.should.equal(params.group_by);
-                result.head.filter.module_id.should.equal(params['filter.module_id']);
-                result.head.user.exclude.should.equal(params['user.exclude']);
-                result.head.from.should.equal(params.from);
-                result.head.to.should.equal(params.to);
+                (result.body.results instanceof Array).should.be.true;
+                result.body.results.length.should.equal(2);
+                result.body.results[0].user.should.equal('8av3Jaj__vC9v9VIY_P-1w');
+                result.body.head.class.should.equal(params.class);
+                result.body.head.property.should.equal(params.property);
+                result.body.head.group_by.should.equal(params.group_by);
+                result.body.head.filter.module_id.should.equal(params['filter.module_id']);
+                result.body.head.user.exclude.should.equal(params['user.exclude']);
+                result.body.head.from.should.equal(params.from);
+                result.body.head.to.should.equal(params.to);
                 done();
             });
         });
@@ -423,16 +425,16 @@ describe("Echo Node Client Test Suite", function(){
                 requestStub.callCount.should.equal(1);
                 firstCall.args[0].method.should.equal('GET');
                 firstCall.args[0].headers.should.not.have.property('cache-control');
-                (result.results instanceof Array).should.be.true;
-                result.results.length.should.equal(2);
-                result.results[0].user.should.equal('8av3Jaj__vC9v9VIY_P-1w');
-                result.head.class.should.equal(params.class);
-                result.head.property.should.equal(params.property);
-                result.head.group_by.should.equal(params.group_by);
-                result.head.filter.module_id.should.equal(params['filter.module_id']);
-                result.head.user.exclude.should.equal(params['user.exclude']);
-                result.head.from.should.equal(params.from);
-                result.head.to.should.equal(params.to);
+                (result.body.results instanceof Array).should.be.true;
+                result.body.results.length.should.equal(2);
+                result.body.results[0].user.should.equal('8av3Jaj__vC9v9VIY_P-1w');
+                result.body.head.class.should.equal(params.class);
+                result.body.head.property.should.equal(params.property);
+                result.body.head.group_by.should.equal(params.group_by);
+                result.body.head.filter.module_id.should.equal(params['filter.module_id']);
+                result.body.head.user.exclude.should.equal(params['user.exclude']);
+                result.body.head.from.should.equal(params.from);
+                result.body.head.to.should.equal(params.to);
                 done();
             });
         });
@@ -498,7 +500,7 @@ describe("Echo Node Client Test Suite", function(){
                 requestStub.callCount.should.equal(1);
                 firstCall.args[0].method.should.equal('GET');
                 firstCall.args[0].headers['cache-control'].should.equal('none');
-                err.should.equal('error response status code: 400');
+                err.should.deepEqual({ code: 2, label: "INVALID_QUERY"});
                 done();
             });
         });
@@ -531,7 +533,7 @@ describe("Echo Node Client Test Suite", function(){
                 requestStub.callCount.should.equal(1);
                 firstCall.args[0].method.should.equal('GET');
                 firstCall.args[0].headers['cache-control'].should.equal('none');
-                err.should.equal('error response status code: 400');
+                err.should.deepEqual({ code: 2, label: "INVALID_QUERY"});
                 done();
             });
         }); 
