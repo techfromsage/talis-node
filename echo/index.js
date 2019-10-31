@@ -213,7 +213,6 @@ function Client() {
         callback(errorResponse);
         return;
       } else {
-        delete body.statusCode;
         callback(null, {"code": codesAndLabels.SUCCESS, "label": codesAndLabels[codesAndLabels.SUCCESS], body: body});
       }
     });
