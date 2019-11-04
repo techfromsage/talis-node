@@ -43,7 +43,7 @@ function generateToken(client, cacheKey, xRequestId, id, secret, callback) {
                     // cache token
                     var cacheFor = data.expires_in - 60, // cache for token validity minus 60s
                         now = (new Date().getTime() / 1000);
-                    data.expires_at = now + data.expires_in;
+                    data.expires_at = parseInt(now) + parseInt(data.expires_in);
                     if (cacheFor > 0) {
                         client.tokenCache.set(cacheKey, JSON.stringify(data), cacheFor);
                         callback(null, data);
