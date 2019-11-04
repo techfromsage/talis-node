@@ -318,3 +318,4 @@ exports.createClient = function createClient(config) {
   var EchoClient = Client();
   return new EchoClient(config);
 };
+exports.echoErrors = codesAndLabels
