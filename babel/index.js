@@ -333,7 +333,7 @@ BabelClient.prototype.createAnnotation = function createAnnotation(token, data, 
         }
         for (var prop in target) {
             if(target.hasOwnProperty(prop)){
-                if (!(prop==="uri" || prop==="fragment" || prop==="asReferencedBy" )) {
+                if (!(prop==="uri" || prop==="fragment" || prop==="asReferencedBy" || prop === "type" )) {
                     throw new Error("Invalid data: hasTarget has unrecognised property '"+prop+"'");
                 }
             }
