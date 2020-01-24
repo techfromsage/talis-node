@@ -615,7 +615,8 @@ describe("Babel Node Client Test Suite", function(){
                     "annotatedBy": "bp",
                     "hasTarget": {
                         "fragment": "p=1",
-                        "uri": "my/uri"
+                        "uri": "my/uri",
+                        "type": 'Text'
                     },
                     "_id": "5628b931a394fb449e000247",
                     "annotatedAt": "2015-10-22T10:23:45.154Z",
@@ -1019,7 +1020,8 @@ describe("Babel Node Client Test Suite", function(){
                     annotatedAt: '2015-02-03T10:28:37.725Z',
                     motivatedBy: 'The Combine',
                     hasTarget: {
-                        uri: 'http://example.com/uri'
+                        uri: 'http://example.com/uri',
+                        type: 'Text'
                     },
                     hasBody:{
                         format: 'text/plain',
@@ -1036,12 +1038,13 @@ describe("Babel Node Client Test Suite", function(){
 
             babel.__set__("request", requestMock);
 
-            babelClient.createAnnotation('secret', {hasBody:{format:'text/plain', type:'Text'}, hasTarget:{uri:'http://example.com'}, annotatedBy:'Gordon Freeman'}, {}, function(err, result){
+            babelClient.createAnnotation('secret', {hasBody:{format:'text/plain', type:'Text'}, hasTarget:{uri:'http://example.com', type: 'Text'}, annotatedBy:'Gordon Freeman'}, {}, function(err, result){
 
                 (err === null).should.be.true;
 
                 result.annotatedBy.should.equal('Gordon Freeman');
                 result.hasTarget.uri.should.equal('http://example.com/uri');
+                result.hasTarget.type.should.equal('Text');
                 result.hasBody.uri.should.equal('http://example.com/another/uri');
                 done();
             });
