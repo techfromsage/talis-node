@@ -1376,7 +1376,8 @@ describe("Babel Node Client Test Suite", function(){
                     annotatedAt: '2015-02-03T10:28:37.725Z',
                     motivatedBy: 'The Combine',
                     hasTarget: {
-                        uri: 'http://example.com/uri'
+                        uri: 'http://example.com/uri',
+                        type: 'Text'
                     },
                     hasBody:{
                         format: 'text/plain',
@@ -1393,7 +1394,7 @@ describe("Babel Node Client Test Suite", function(){
 
             babel.__set__("request", requestMock);
 
-            babelClient.updateAnnotation('secret', {_id: 'testid', hasBody:{format:'text/plain', type:'Text'}, hasTarget:{uri:'http://example.com'}, annotatedBy:'Gordon Freeman'}, function(err, result){
+            babelClient.updateAnnotation('secret', {_id: 'testid', hasBody:{format:'text/plain', type:'Text'}, hasTarget:{uri:'http://example.com', type: 'Text'}, annotatedBy:'Gordon Freeman'}, function(err, result){
                 (err === null).should.be.true;
                 result.annotatedBy.should.equal('Gordon Freeman');
                 result.hasTarget.uri.should.equal('http://example.com/uri');
