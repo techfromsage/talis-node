@@ -1,0 +1,17 @@
+version: 1
+update_configs:
+  - package_manager: 'javascript'
+    directory: '/'
+    update_schedule: 'live'
+    default_reviewers:
+      - 'kiyanwang'
+      - 'ShaunParsons'
+      - 'malcyL'
+      - 'mrliptontea'
+    default_labels:
+      - 'dependencies'
+      - 'security'
+      - '30%'
+    allowed_updates:
+      - match:
+          update_type: 'security'
