@@ -351,6 +351,143 @@ describe("Babel Node Client Test Suite", function(){
         });
     });
 
+    describe("- Get Target Feed Length tests", function(){
+        it("- should throw error if no target supplied", function(){
+            var babelClient = babel.createClient({
+                    babel_host:"http://babel",
+                    babel_port:3000
+                });
+
+            var getTargetFeedLength = function(){
+                return babelClient.getTargetFeedLength(null, null, function(err, result){});
+            };
+
+            getTargetFeedLength.should.throw("Missing target");
+        });
+        it("- should throw error if no persona token supplied", function(){
+            var babelClient = babel.createClient({
+                babel_host:"http://babel",
+                babel_port:3000
+            });
+
+            var getTargetFeedLength = function(){
+                return babelClient.getTargetFeedLength('TARGET', null, function(err, result){});
+            };
+
+            getTargetFeedLength.should.throw("Missing Persona token");
+        });
+
+        it("- should return an error if call to request returns an error when get target feed length", function(done){
+            var babel = rewire("../../index.js");
+
+            var babelClient = babel.createClient({
+                babel_host:"http://babel",
+                babel_port:3000
+            });
+            var requestStub = function(options, callback){
+                callback(new Error('Error communicating with Babel'));
+            };
+
+            babel.__set__("request", requestStub);
+
+            babelClient.getTargetFeedLength('TARGET', 'secret', function(err, result){
+
+                (err === null).should.be.false;
+                err.message.should.equal('Error communicating with Babel');
+                (typeof result).should.equal('undefined');
+                done();
+            });
+        });
+
+        it("- should return an error (401) if persona token is invalid when get target feed length", function(done){
+            var babel = rewire("../../index.js");
+
+            var babelClient = babel.createClient({
+                babel_host:"http://babel",
+                babel_port:3000
+            });
+            var requestStub = function(options, callback){
+                callback(null, {statusCode:401}, JSON.stringify({error:"invalid_token", error_description:"The token is invalid or has expired"}));
+            };
+
+            babel.__set__("request", requestStub);
+
+            babelClient.getTargetFeedLength('TARGET', 'secret', function(err, result){
+
+                (err === null).should.be.false;
+                err.http_code.should.equal(401);
+                err.message.should.equal('The token is invalid or has expired');
+                (typeof result).should.equal('undefined');
+                done();
+            });
+        });
+
+        it("- should return an error (404) if babel returns no feed when get target feed", function(done){
+            var babel = rewire("../../index.js");
+
+            var babelClient = babel.createClient({
+                babel_host:"http://babel",
+                babel_port:3000
+            });
+            var requestStub = function(options, callback){
+                callback(null, {}, JSON.stringify({"error":"feed_not_found", "error_description":"Feed not found"}));
+            };
+
+            babel.__set__("request", requestStub);
+
+            babelClient.getTargetFeedLength('TARGET', 'secret', function(err, result){
+                (err === null).should.be.false;
+                err.http_code.should.equal(404);
+                err.message.should.equal('Feed not found');
+                (typeof result).should.equal('undefined');
+                done();
+            });
+        });
+
+        it("- should return the feed length if no error from babel and feed is found when get target feed", function(done){
+            var babel = rewire("../../index.js");
+
+            var babelClient = babel.createClient({
+                babel_host:"http://babel",
+                babel_port:3000
+            });
+
+            var requestStub = function(options, callback){
+                callback(null, {}, JSON.stringify({"count":2}));
+            };
+
+            babel.__set__("request", requestStub);
+
+            babelClient.getTargetFeedLength('TARGET', 'secret', function(err, result){
+                (err === null).should.be.true;
+                result.count.should.equal(2);
+                done();
+            });
+        });
+
+        it("- should not blow up if invalid JSON returned", function(done){
+            var babel = rewire("../../index.js");
+
+            var babelClient = babel.createClient({
+                babel_host:"http://babel",
+                babel_port:3000
+            });
+
+            var requestStub = function(options, callback){
+                callback(null, {}, null);
+            };
+
+            babel.__set__("request", requestStub);
+
+            babelClient.getTargetFeedLength('TARGET', 'secret', function(err, result){
+              (err === null).should.be.false;
+              err.message.should.equal('Error parsing JSON: null');
+              (typeof result).should.equal('undefined');
+                done();
+            });
+        });
+    });
+
     describe("- Test Querying Multiple Feeds", function(){
         it("- should throw error if no feed ids supplied", function(){
             var babelClient = babel.createClient({

@@ -143,6 +143,36 @@ BabelClient.prototype.getTargetFeed = function getTargetFeed(target, token, hydr
     });
 };
 
+BabelClient.prototype.getTargetFeedLength = function getTargetFeedLength(target, token, callback){
+    if(!target){
+        throw new Error('Missing target');
+    }
+    if(!token){
+        throw new Error('Missing Persona token');
+    }
+
+    var self = this;
+    var requestOptions = {
+        url: this._getBaseURL() +
+          '/feeds/targets/'+md5(target)+'/activity/annotations/aggregations/count',
+        headers: {
+            'Accept': 'application/json',
+            'Authorization':'Bearer '+token,
+            'Host': this.config.babel_hostname
+        }
+    };
+
+    this.debug(JSON.stringify(requestOptions));
+
+    request(requestOptions, function requestResponse(err, response, body){
+        if(err){
+            callback(err);
+        } else{
+            self._parseJSON(response, body, callback);
+        }
+    });
+};
+
 /***
  * Queries multiple feeds.
  * Given an array of feed ids it will return a merged hydrated feed.
