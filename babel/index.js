@@ -2,6 +2,7 @@
 
 var _ = require('lodash'),
     request = require('request'),
+    rpn = require('request-promise-native'),
     md5 = require('md5'),
     querystring = require('querystring');
 
@@ -89,6 +90,82 @@ BabelClient.prototype.headTargetFeed = function headTargetFeed(target, token, pa
     });
 };
 
+BabelClient.prototype.getEntireTargetFeed = async function (target, token, hydrate, callback) {
+    if(!target){
+        throw new Error('Missing target');
+    }
+    if(!token){
+        throw new Error('Missing Persona token');
+    }
+
+    let results = {
+        annotations: []
+    };
+    const perPage = 1000;
+    let page = 0;
+    let callbackError = null;
+
+    while (++page) {
+        const currentPage = page - 1;
+        this.debug('getTargetFeedNoLimit fetching page' - currentPage);
+
+        const queryString = this._queryStringParams({
+            limit: perPage,
+            offset: currentPage * perPage
+        })
+
+        this.debug(JSON.stringify(requestOptions));
+
+        const requestOptions = {
+            method: 'GET',
+            json: true,
+            url:  this._getBaseURL()
+                + '/feeds/targets/'
+                + md5(target)
+                + '/activity/annotations'
+                + ((hydrate === true) ? '/hydrate' : '')
+                + (!_.isEmpty(queryString) ? '?'+queryString : ''),
+            headers: {
+                'Accept': 'application/json',
+                'Authorization':'Bearer '+ token,
+                'Host': this.config.babel_hostname
+            }
+        };
+        
+        try {
+            const {annotations, error, feed_length, userProfiles} = await rpn(requestOptions);
+
+            if (error) {
+                callbackError = new Error(jsonBody.error_description);
+                callbackError.http_code = response.statusCode || 404;
+                break;
+            } 
+
+            results = {
+                ...results,
+                feed_length,
+                annotations: [
+                    ...results.annotations,
+                    ...annotations
+                ],
+                userProfiles: {
+                    ...results.userProfiles,
+                    ...userProfiles
+                }
+            }
+            const isFinalPage = annotations.length < perPage
+            if (isFinalPage) {
+                break;
+            }
+        } catch (error) {
+            this.error(`Error fetching babel feed ${JSON.stringify(error)}`);
+
+            callbackError = error
+            break;
+        }
+    }
+    return callback(callbackError, results);
+}
 /**
  * Get a feed based off a target identifier. Return either a list of feed identifiers, or hydrate it and
  * pass back the data as well
