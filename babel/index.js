@@ -114,8 +114,6 @@ BabelClient.prototype.getEntireTargetFeed = async function (target, token, hydra
             offset: currentPage * perPage
         })
 
-        this.debug(JSON.stringify(requestOptions));
-
         const requestOptions = {
             method: 'GET',
             json: true,
@@ -131,7 +129,9 @@ BabelClient.prototype.getEntireTargetFeed = async function (target, token, hydra
                 'Host': this.config.babel_hostname
             }
         };
-        
+
+        this.debug(JSON.stringify(requestOptions));
+
         try {
             const {annotations, error, feed_length, userProfiles} = await rpn(requestOptions);
 
