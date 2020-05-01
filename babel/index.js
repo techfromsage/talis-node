@@ -114,6 +114,8 @@ BabelClient.prototype.getEntireTargetFeed = async function (target, token, hydra
             offset: currentPage * perPage
         })
 
+        console.log('getEntireTargetFeed');
+        
         const requestOptions = {
             method: 'GET',
             json: true,
