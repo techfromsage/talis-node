@@ -91,11 +91,16 @@ BabelClient.prototype.headTargetFeed = function headTargetFeed(target, token, pa
 };
 
 BabelClient.prototype.getEntireTargetFeed = async function (target, token, hydrate, callback) {
+    let callbackError = undefined;
     if(!target){
-        throw new Error('Missing target');
+        callbackError = Error('Missing target');
+        callbackError.http_code = 400;
+        return callback(callbackError);
     }
     if(!token){
-        throw new Error('Missing Persona token');
+        callbackError = Error('Missing Persona token');
+        callbackError.http_code = 400;
+        return callback(callbackError);
     }
 
     let results = {
@@ -103,7 +108,6 @@ BabelClient.prototype.getEntireTargetFeed = async function (target, token, hydra
     };
     const perPage = 1000;
     let currentPage = 0;
-    let callbackError = undefined;
     let isFinalPage = false;
 
     do {
@@ -164,7 +168,6 @@ BabelClient.prototype.getEntireTargetFeed = async function (target, token, hydra
                 }
                 isFinalPage = annotations.length < perPage;
             }
-
 
         } catch (error) {
             this.error(`Error fetching babel feed ${JSON.stringify(error)}`);

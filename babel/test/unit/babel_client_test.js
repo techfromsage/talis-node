@@ -2,6 +2,7 @@
 
 var should = require('should'),
     assert = require('assert'),
+    sinon = require('sinon'),
     babel = require('../../index.js'),
     rewire = require("rewire");
 
@@ -170,6 +171,164 @@ describe("Babel Node Client Test Suite", function(){
             });
         });
     });
+
+    describe("- Get Entire Target Feed tests", function(){
+        it("- should callback with an error if no target supplied", function(done){
+            var babelClient = babel.createClient({
+                    babel_host:"http://babel",
+                    babel_port:3000
+                });
+
+            babelClient.getEntireTargetFeed(null, null, null, function(err, result){
+                (err === undefined).should.be.false;
+                err.message.should.equal('Missing target');
+                done();
+            });
+        });
+
+        it("- should callback with an error if no persona token supplied", function(done){
+            var babelClient = babel.createClient({
+                babel_host:"http://babel",
+                babel_port:3000
+            });
+
+            babelClient.getEntireTargetFeed('target', null, null, function(err, result){
+                (err === undefined).should.be.false;
+                err.message.should.equal('Missing Persona token');
+                done();
+            });
+        });
+
+        it("- should return an error if call to request returns an error when get target feed", function(done){
+            var babel = rewire("../../index.js");
+
+            var babelClient = babel.createClient({
+                babel_host:"http://babel",
+                babel_port:3000
+            });
+            var requestStub = () => new Promise ((_resolve, reject) => reject(Error('Error communicating with Babel'))) 
+
+            babel.__set__("rpn", requestStub);
+
+            babelClient.getEntireTargetFeed('TARGET', 'secret', true, function(err, result){
+                (err === undefined).should.be.false;
+                err.message.should.equal('Error communicating with Babel');
+                done();
+            });
+        });
+
+        it("- should return an error (401) if persona token is invalid when get target feed", function(done){
+            var babel = rewire("../../index.js");
+
+            var babelClient = babel.createClient({
+                babel_host:"http://babel",
+                babel_port:3000
+            });
+            var requestStub = () => new Promise ((resolve, reject) => resolve({
+                statusCode: 401,
+                body: {
+                    error:"invalid_token", 
+                    error_description:"The token is invalid or has expired"
+                }
+            })) 
+
+            babel.__set__("rpn", requestStub);
+
+            babelClient.getEntireTargetFeed('TARGET', 'secret', true, function(err, result){
+                (err === undefined).should.be.false;
+                err.http_code.should.equal(401);
+                err.message.should.equal('The token is invalid or has expired');
+                done();
+            });
+        });
+
+        it("- should return an error (404) if babel returns no feed when get target feed", function(done){
+            var babel = rewire("../../index.js");
+
+            var babelClient = babel.createClient({
+                babel_host:"http://babel",
+                babel_port:3000
+            });
+            var requestStub = () => new Promise ((resolve, _reject) => resolve({
+                statusCode: 404,
+                body: {
+                    error:"feed_not_found", 
+                    error_description:"Feed not found"
+                }
+            })) 
+
+            babel.__set__("rpn", requestStub);
+
+            babelClient.getEntireTargetFeed('TARGET', 'secret', true, function(err, result){
+                (err === undefined).should.be.false;
+                err.http_code.should.equal(404);
+                err.message.should.equal('Feed not found');
+                done();
+            });
+        });
+
+        it("- should return results even when on the babel limit without an error", function(done){
+            var babel = rewire("../../index.js");
+
+            var babelClient = babel.createClient({
+                babel_host:"http://babel",
+                babel_port:3000
+            });
+            var isFirstPage = true;
+            var requestStub = () => new Promise ((resolve, _reject) => {
+                var annotations = isFirstPage ? Array(1000) : [{
+                    annotatedBy:"tn",
+                    _id:"54c107db52be6b4d90000001",
+                    __v:0,
+                    annotatedAt:"2015-01-22T14:23:23.013Z",
+                    motivatedBy:"commenting",
+                    hasTarget:[],
+                    hasBody:{}
+                },{
+                    annotatedBy:"tn",
+                    _id:"54c10857ae44b3f492000001",
+                    __v:0,
+                    annotatedAt:"2015-01-22T14:25:27.294Z",
+                    motivatedBy:"commenting",
+                    hasTarget:[],
+                    hasBody:{}
+                }]
+
+                isFirstPage = false
+
+                resolve({
+                    statusCode: 200,
+                    body: {
+                        count:1000,
+                        limit:1000,
+                        offset:0,
+                        feed_length: 1002,
+                        userProfiles: {
+                            user_1: {
+                                first_name: "TN",
+                                surname: "TestAccount",
+                                gravatarUrl: "a98f8ca335dc8dd239b1324b7e88f0db"
+                            }
+                        },
+                        annotations
+                    }
+                })
+            }) 
+
+            var requestStubSpy = sinon.spy(requestStub);
+            babel.__set__("rpn", requestStubSpy);
+
+            babelClient.getEntireTargetFeed('TARGET', 'secret', true, function(err, result){
+                requestStubSpy.callCount.should.equal(2);
+                (err === undefined).should.be.true;
+                result.feed_length.should.equal(1002);
+                result.userProfiles.user_1.first_name.should.equal('TN')
+                result.annotations.should.have.lengthOf(1002);
+                done();
+            });
+        });
+    });
+
     describe("- Get Target Feed tests", function(){
 
         it("- should throw error if no target supplied", function(){
