@@ -114,11 +114,11 @@ BabelClient.prototype.getEntireTargetFeed = async function (target, token, hydra
             offset: currentPage * perPage
         })
 
-        console.log('getEntireTargetFeed');
-        
         const requestOptions = {
-            method: 'GET',
             json: true,
+            simple: false,
+            resolveWithFullResponse: true,
+            method: 'GET',
             url:  this._getBaseURL()
                 + '/feeds/targets/'
                 + md5(target)
@@ -135,10 +135,19 @@ BabelClient.prototype.getEntireTargetFeed = async function (target, token, hydra
         this.debug(JSON.stringify(requestOptions));
 
         try {
-            const {annotations, error, feed_length, userProfiles} = await rpn(requestOptions);
-
+            const { 
+                body: {
+                    feed_length,
+                    annotations,
+                    userProfiles,
+                    error,
+                    error_description,
+                }, 
+                ...response
+            } = await rpn(requestOptions);
+            
             if (error) {
-                callbackError = new Error(jsonBody.error_description);
+                callbackError = new Error(error_description);
                 callbackError.http_code = response.statusCode || 404;
                 break;
             } 
@@ -168,6 +177,7 @@ BabelClient.prototype.getEntireTargetFeed = async function (target, token, hydra
     }
     return callback(callbackError, results);
 }
+
 /**
  * Get a feed based off a target identifier. Return either a list of feed identifiers, or hydrate it and
  * pass back the data as well
