@@ -67,7 +67,7 @@ BabelClient.prototype.headTargetFeed = function headTargetFeed(target, token, pa
     var requestOptions = {
         method: "HEAD",
         url: this._getBaseURL() +
-          '/feeds/targets/'+md5(target)+'/activity/annotations' + (!_.isEmpty(queryString) ? '?'+queryString : ''),
+            '/feeds/targets/'+md5(target)+'/activity/annotations' + (!_.isEmpty(queryString) ? '?'+queryString : ''),
         headers: {
             'Accept': 'application/json',
             'Authorization':'Bearer '+token,
@@ -101,17 +101,17 @@ BabelClient.prototype.getEntireTargetFeed = async function (target, token, hydra
     let results = {
         annotations: []
     };
-    const perPage = 1000;
-    let page = 0;
-    let callbackError = null;
+    const perPage = 5;
+    let currentPage = 0;
+    let callbackError = undefined;
+    let isFinalPage = false;
 
-    while (++page) {
-        const currentPage = page - 1;
-        this.debug('getTargetFeedNoLimit fetching page' - currentPage);
+    do {
+        this.debug(`getTargetFeedNoLimit fetching page' - ${currentPage}`);
 
         const queryString = this._queryStringParams({
             limit: perPage,
-            offset: currentPage * perPage
+            offset: currentPage * perPage,
         })
 
         const requestOptions = {
@@ -128,8 +128,8 @@ BabelClient.prototype.getEntireTargetFeed = async function (target, token, hydra
             headers: {
                 'Accept': 'application/json',
                 'Authorization':'Bearer '+ token,
-                'Host': this.config.babel_hostname
-            }
+                'Host': this.config.babel_hostname,
+            },
         };
 
         this.debug(JSON.stringify(requestOptions));
@@ -149,32 +149,31 @@ BabelClient.prototype.getEntireTargetFeed = async function (target, token, hydra
             if (error) {
                 callbackError = new Error(error_description);
                 callbackError.http_code = response.statusCode || 404;
-                break;
-            } 
-
-            results = {
-                ...results,
-                feed_length,
-                annotations: [
-                    ...results.annotations,
-                    ...annotations
-                ],
-                userProfiles: {
-                    ...results.userProfiles,
-                    ...userProfiles
+            } else {
+                results = {
+                    ...results,
+                    feed_length,
+                    annotations: [
+                        ...results.annotations,
+                        ...annotations
+                    ],
+                    userProfiles: {
+                        ...results.userProfiles,
+                        ...userProfiles
+                    }
                 }
+                isFinalPage = annotations.length < perPage;
             }
-            const isFinalPage = annotations.length < perPage
-            if (isFinalPage) {
-                break;
-            }
+
+
         } catch (error) {
             this.error(`Error fetching babel feed ${JSON.stringify(error)}`);
-
-            callbackError = error
-            break;
+            callbackError = error;
         }
-    }
+
+        currentPage = currentPage + 1;
+    } while (!isFinalPage && callbackError === undefined);
+
     return callback(callbackError, results);
 }
 
