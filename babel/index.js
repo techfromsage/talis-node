@@ -101,7 +101,7 @@ BabelClient.prototype.getEntireTargetFeed = async function (target, token, hydra
     let results = {
         annotations: []
     };
-    const perPage = 5;
+    const perPage = 1000;
     let currentPage = 0;
     let callbackError = undefined;
     let isFinalPage = false;
