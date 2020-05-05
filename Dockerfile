@@ -11,11 +11,8 @@ RUN apt-get update && apt-get install -y --force-yes \
         build-essential \
         envconsul \
     && rm -rf /var/lib/apt/lists/* \
-    && apt-get clean
-
-
-# Tidy up
-RUN apt-get -y autoremove && apt-get clean && apt-get autoclean && \
+    && apt-get clean \
+    && apt-get -y autoremove && apt-get clean && apt-get autoclean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 RUN mkdir -p /var/talis-node
