@@ -33,8 +33,8 @@ describe("Persona Client Test Suite - Constructor & Token Tests", function() {
                         module: "redis",
                         options: {
                             redisData: {
-                                hostname: "localhost",
-                                port: 6379
+                                hostname: process.env.REDIS_TEST_HOST || "localhost",
+                                port: process.env.REDIS_TEST_PORT || 6379
                             }
                         }
                     }
@@ -98,8 +98,8 @@ describe("Persona Client Test Suite - Constructor & Token Tests", function() {
                     module: "redis",
                     options: {
                         redisData: {
-                            hostname: "localhost",
-                            port: 6379
+                            hostname: process.env.REDIS_TEST_HOST || "localhost",
+                            port: process.env.REDIS_TEST_PORT || 6379
                         }
                     }
                 },
@@ -111,8 +111,8 @@ describe("Persona Client Test Suite - Constructor & Token Tests", function() {
                 persona_port: process.env.PERSONA_TEST_PORT || 80,
                 persona_scheme: process.env.PERSONA_TEST_SCHEME || "http",
                 persona_oauth_route: "/oauth/tokens/",
-                redis_host: "localhost",
-                redis_port: 6379,
+                redis_host: process.env.REDIS_TEST_HOST || "localhost",
+                redis_port: process.env.REDIS_TEST_PORT || 6379,
                 redis_db: 0,
                 enable_debug: false,
                 cert_background_refresh: false,
