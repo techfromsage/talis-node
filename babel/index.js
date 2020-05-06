@@ -2,6 +2,7 @@
 
 var _ = require('lodash'),
     request = require('request'),
+    rpn = require('request-promise-native'),
     md5 = require('md5'),
     querystring = require('querystring');
 
@@ -66,7 +67,7 @@ BabelClient.prototype.headTargetFeed = function headTargetFeed(target, token, pa
     var requestOptions = {
         method: "HEAD",
         url: this._getBaseURL() +
-          '/feeds/targets/'+md5(target)+'/activity/annotations' + (!_.isEmpty(queryString) ? '?'+queryString : ''),
+            '/feeds/targets/'+md5(target)+'/activity/annotations' + (!_.isEmpty(queryString) ? '?'+queryString : ''),
         headers: {
             'Accept': 'application/json',
             'Authorization':'Bearer '+token,
@@ -88,6 +89,96 @@ BabelClient.prototype.headTargetFeed = function headTargetFeed(target, token, pa
         }
     });
 };
+
+BabelClient.prototype.getEntireTargetFeed = async function (target, token, hydrate, callback) {
+    let callbackError = undefined;
+    if(!target){
+        callbackError = Error('Missing target');
+        callbackError.http_code = 400;
+        return callback(callbackError);
+    }
+    if(!token){
+        callbackError = Error('Missing Persona token');
+        callbackError.http_code = 400;
+        return callback(callbackError);
+    }
+
+    let results = {
+        annotations: []
+    };
+    const perPage = 1000;
+    let currentPage = 0;
+    let isFinalPage = false;
+
+    do {
+        this.debug(`getTargetFeedNoLimit fetching page' - ${currentPage}`);
+
+        const queryString = this._queryStringParams({
+            limit: perPage,
+            offset: currentPage * perPage,
+        })
+
+        const requestOptions = {
+            json: true,
+            simple: false,
+            resolveWithFullResponse: true,
+            method: 'GET',
+            url:  this._getBaseURL()
+                + '/feeds/targets/'
+                + md5(target)
+                + '/activity/annotations'
+                + ((hydrate === true) ? '/hydrate' : '')
+                + (!_.isEmpty(queryString) ? '?'+queryString : ''),
+            headers: {
+                'Accept': 'application/json',
+                'Authorization':'Bearer '+ token,
+                'Host': this.config.babel_hostname,
+            },
+        };
+
+        this.debug(JSON.stringify(requestOptions));
+
+        try {
+            const { 
+                body: {
+                    feed_length,
+                    annotations,
+                    userProfiles,
+                    error,
+                    error_description,
+                }, 
+                ...response
+            } = await rpn(requestOptions);
+            
+            if (error) {
+                callbackError = new Error(error_description);
+                callbackError.http_code = response.statusCode || 404;
+            } else {
+                results = {
+                    ...results,
+                    feed_length,
+                    annotations: [
+                        ...results.annotations,
+                        ...annotations
+                    ],
+                    userProfiles: {
+                        ...results.userProfiles,
+                        ...userProfiles
+                    }
+                }
+                isFinalPage = annotations.length < perPage;
+            }
+
+        } catch (error) {
+            this.error(`Error fetching babel feed ${JSON.stringify(error)}`);
+            callbackError = error;
+        }
+
+        currentPage = currentPage + 1;
+    } while (!isFinalPage && callbackError === undefined);
+
+    return callback(callbackError, results);
+}
 
 /**
  * Get a feed based off a target identifier. Return either a list of feed identifiers, or hydrate it and
