@@ -453,16 +453,14 @@ BabelClient.prototype.createAnnotation = function createAnnotation(token, data, 
     this.debug(JSON.stringify(requestOptions));
 
     request.post(requestOptions, function requestResponse(err, response, body){
-        if(err){
+        if (err) {
             callback(err);
-        } else{
-            if(!this._responseSuccessful(response) || (body.message && body.errors)){
-                var babelError = new Error(body.message);
-                babelError.http_code = response.statusCode || 404;
-                callback(babelError);
-            } else{
-                callback(null, body);
-            }
+        } else if (!this._responseSuccessful(response)) {
+            var babelError = new Error('Error creating annotation: ' + JSON.stringify(body));
+            babelError.http_code = response && response.statusCode ? response.statusCode : 404;
+            callback(babelError);
+        } else {
+            callback(null, body);
         }
     }.bind(this));
 };
@@ -553,14 +551,12 @@ BabelClient.prototype.updateAnnotation = function updateAnnotation(token, data, 
     request.put(requestOptions, function requestResponse(err, response, body){
         if (err) {
             callback(err);
+        } else if (!this._responseSuccessful(response)) {
+            var babelError = new Error('Error updating annotation: ' + JSON.stringify(body));
+            babelError.http_code = response && response.statusCode ? response.statusCode : 404;
+            callback(babelError);
         } else {
-            if(!this._responseSuccessful(response) || (body.message && body.errors)){
-                var babelError = new Error(body.message);
-                babelError.http_code = response.statusCode || 404;
-                callback(babelError);
-            } else {
-                callback(null, body);
-            }
+            callback(null, body);
         }
     }.bind(this));
 };
