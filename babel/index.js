@@ -139,17 +139,17 @@ BabelClient.prototype.getEntireTargetFeed = async function (target, token, hydra
         this.debug(JSON.stringify(requestOptions));
 
         try {
-            const { 
+            const {
                 body: {
                     feed_length,
                     annotations,
                     userProfiles,
                     error,
                     error_description,
-                }, 
+                },
                 ...response
             } = await rpn(requestOptions);
-            
+
             if (error) {
                 callbackError = new Error(error_description);
                 callbackError.http_code = response.statusCode || 404;
@@ -267,7 +267,7 @@ BabelClient.prototype.getFeeds = function getFeeds(feeds, token, callback) {
 
     this.debug(JSON.stringify(requestOptions));
 
-    request(requestOptions, function requesResponse(err, response, body) {
+    request(requestOptions, function requestResponse(err, response, body) {
         if (err) {
             callback(err);
         } else {
@@ -364,7 +364,7 @@ BabelClient.prototype.getAnnotations = function getAnnotations(token, querystrin
  *
  * @param {string} token Persona token
  * @param {object} data Data that can be passed into an annotation
- * @param {object} data.hasbody
+ * @param {object} data.hasBody
  * @param {string} data.hasBody.format
  * @param {string} data.hasBody.type
  * @param {string} data.hasBody.chars
@@ -376,7 +376,7 @@ BabelClient.prototype.getAnnotations = function getAnnotations(token, querystrin
  * @param {string} data.hasTarget.fragment
  * @param {string} data.hasTarget.asReferencedBy
  * @param {string} data.annotatedBy
- * @param {string} data.motiviatedBy
+ * @param {string} data.motivatedBy
  * @param {string} data.annotatedAt
  * @param {object} options that control the request being made to babel.
  * @param {boolean} options.headers['X-Ingest-Synchronously']
@@ -453,16 +453,14 @@ BabelClient.prototype.createAnnotation = function createAnnotation(token, data, 
     this.debug(JSON.stringify(requestOptions));
 
     request.post(requestOptions, function requestResponse(err, response, body){
-        if(err){
+        if (err) {
             callback(err);
-        } else{
-            if(!this._responseSuccessful(response) || (body.message && body.errors)){
-                var babelError = new Error(body.message);
-                babelError.http_code = response.statusCode || 404;
-                callback(babelError);
-            } else{
-                callback(null, body);
-            }
+        } else if (!this._responseSuccessful(response)) {
+            var babelError = new Error('Error creating annotation: ' + JSON.stringify(body));
+            babelError.http_code = response && response.statusCode ? response.statusCode : 404;
+            callback(babelError);
+        } else {
+            callback(null, body);
         }
     }.bind(this));
 };
@@ -473,7 +471,7 @@ BabelClient.prototype.createAnnotation = function createAnnotation(token, data, 
  * @param {string} token Persona token
  * @param {object} data Data that can be passed into an annotation
  * @param {object} data._id
- * @param {object} data.hasbody
+ * @param {object} data.hasBody
  * @param {string} data.hasBody.format
  * @param {string} data.hasBody.type
  * @param {string} data.hasBody.chars
@@ -485,7 +483,7 @@ BabelClient.prototype.createAnnotation = function createAnnotation(token, data, 
  * @param {string} data.hasTarget.fragment
  * @param {string} data.hasTarget.asReferencedBy
  * @param {string} data.annotatedBy
- * @param {string} data.motiviatedBy
+ * @param {string} data.motivatedBy
  * @param {string} data.annotatedAt
  * @param callback
  */
@@ -553,14 +551,12 @@ BabelClient.prototype.updateAnnotation = function updateAnnotation(token, data, 
     request.put(requestOptions, function requestResponse(err, response, body){
         if (err) {
             callback(err);
+        } else if (!this._responseSuccessful(response)) {
+            var babelError = new Error('Error updating annotation: ' + JSON.stringify(body));
+            babelError.http_code = response && response.statusCode ? response.statusCode : 404;
+            callback(babelError);
         } else {
-            if(!this._responseSuccessful(response) || (body.message && body.errors)){
-                var babelError = new Error(body.message);
-                babelError.http_code = response.statusCode || 404;
-                callback(babelError);
-            } else {
-                callback(null, body);
-            }
+            callback(null, body);
         }
     }.bind(this));
 };

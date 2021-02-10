@@ -206,7 +206,7 @@ describe("Babel Node Client Test Suite", function(){
                 babel_host:"http://babel",
                 babel_port:3000
             });
-            var requestStub = () => new Promise ((_resolve, reject) => reject(Error('Error communicating with Babel'))) 
+            var requestStub = () => new Promise ((_resolve, reject) => reject(Error('Error communicating with Babel')))
 
             babel.__set__("rpn", requestStub);
 
@@ -227,10 +227,10 @@ describe("Babel Node Client Test Suite", function(){
             var requestStub = () => new Promise ((resolve, reject) => resolve({
                 statusCode: 401,
                 body: {
-                    error:"invalid_token", 
+                    error:"invalid_token",
                     error_description:"The token is invalid or has expired"
                 }
-            })) 
+            }))
 
             babel.__set__("rpn", requestStub);
 
@@ -252,10 +252,10 @@ describe("Babel Node Client Test Suite", function(){
             var requestStub = () => new Promise ((resolve, _reject) => resolve({
                 statusCode: 404,
                 body: {
-                    error:"feed_not_found", 
+                    error:"feed_not_found",
                     error_description:"Feed not found"
                 }
-            })) 
+            }))
 
             babel.__set__("rpn", requestStub);
 
@@ -313,7 +313,7 @@ describe("Babel Node Client Test Suite", function(){
                         annotations
                     }
                 })
-            }) 
+            })
 
             var requestStubSpy = sinon.spy(requestStub);
             babel.__set__("rpn", requestStubSpy);
@@ -1155,10 +1155,46 @@ describe("Babel Node Client Test Suite", function(){
             babelClient.createAnnotation('secret', {hasBody:{format:'text/plain', type:'Text'}, hasTarget:{uri:'http://example.com'}, annotatedBy:'Gordon Freeman'}, {}, function(err, result){
 
                 (err === null).should.be.false;
-                err.message.should.equal('Bad Request');
+                err.message.should.equal(
+                  'Error creating annotation: {"body":"","message":"Bad Request"}'
+                );
                 (typeof result).should.equal('undefined');
                 done();
             });
+        });
+
+        it("- should return an error if call to request returns a 502 response with no body", function (done) {
+          var babel = rewire("../../index.js");
+
+          var babelClient = babel.createClient({
+            babel_host: "http://babel",
+            babel_port: 3000,
+          });
+          var requestStub = {
+            post: function (options, callback) {
+              callback(null, { statusCode: 502 }, { message: "Bad Gateway" });
+            },
+          };
+
+          babel.__set__("request", requestStub);
+
+          babelClient.createAnnotation(
+            "secret",
+            {
+              hasBody: { format: "text/plain", type: "Text" },
+              hasTarget: { uri: "http://example.com" },
+              annotatedBy: "Gordon Freeman",
+            },
+            {},
+            function (err, result) {
+              (err === null).should.be.false;
+              err.message.should.equal(
+                'Error creating annotation: {"message":"Bad Gateway"}'
+              );
+              (typeof result).should.equal("undefined");
+              done();
+            }
+          );
         });
 
         it("- should return no errors if everything is successful", function(done){
@@ -1512,10 +1548,46 @@ describe("Babel Node Client Test Suite", function(){
 
             babelClient.updateAnnotation('secret', {_id: 'testid', hasBody:{format:'text/plain', type:'Text'}, hasTarget:{uri:'http://example.com'}, annotatedBy:'Gordon Freeman'}, function(err, result){
                 (err === null).should.be.false;
-                err.message.should.equal('Bad Request');
+                err.message.should.equal(
+                  'Error updating annotation: {"body":"","message":"Bad Request"}'
+                );
                 (typeof result).should.equal('undefined');
                 done();
             });
+        });
+
+        it("- should return an error if call to request returns a 502 response with no body", function (done) {
+          var babel = rewire("../../index.js");
+
+          var babelClient = babel.createClient({
+            babel_host: "http://babel",
+            babel_port: 3000,
+          });
+          var requestStub = {
+            put: function (options, callback) {
+              callback(null, { statusCode: 400 }, { message: "Bad Gateway" });
+            },
+          };
+
+          babel.__set__("request", requestStub);
+
+          babelClient.updateAnnotation(
+            "secret",
+            {
+              _id: "testid",
+              hasBody: { format: "text/plain", type: "Text" },
+              hasTarget: { uri: "http://example.com" },
+              annotatedBy: "Gordon Freeman",
+            },
+            function (err, result) {
+              (err === null).should.be.false;
+              err.message.should.equal(
+                'Error updating annotation: {"message":"Bad Gateway"}'
+              );
+              (typeof result).should.equal("undefined");
+              done();
+            }
+          );
         });
 
         it("- should return no errors if everything is successful", function(done){
