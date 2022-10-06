@@ -24,6 +24,11 @@ jobs:
     steps:
       - checkout
       - run:
+          name: configure git
+          command: |
+            git config --global url."https://".insteadOf ssh://
+            git config --global url."https://".insteadOf git://
+      - run:
           name: install-npm
           command: npm install
       - run:
