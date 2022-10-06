@@ -4,12 +4,22 @@ workflows:
   version: 2
   build:
     jobs:
-      - build
+      - build:
+          matrix:
+            parameters:
+              - 10.24
+              - 12.13
+              - 14.20
+              - 16.17
+              - 18.10
 
 jobs:
   build:
+    parameters:
+      node-version:
+        type: string
     docker:
-      - image: cimg/node:10.24.1
+      - image: cimg/node:<< parameters.node-version >>
       - image: redis:7
     steps:
       - checkout
