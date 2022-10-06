@@ -7,11 +7,12 @@ workflows:
       - build:
           matrix:
             parameters:
-              - 10.24
-              - 12.13
-              - 14.20
-              - 16.17
-              - 18.10
+              node-version:
+                - 10.24
+                - 12.13
+                - 14.20
+                - 16.17
+                - 18.10
 
 jobs:
   build:
