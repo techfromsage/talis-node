@@ -262,10 +262,42 @@ describe("Echo Node Client Test Suite", function(){
                 );
             });
 
-            const events = [{class:'class', source:'source', timestamp: 1324524508 }, {class:'class', source:'source', timestamp: 1324524509.123 }];
+            const events = [
+                {
+                    class:'class',
+                    source:'source',
+                    timestamp: 1324524508
+                },
+                {
+                    class:'class',
+                    source:'source', 
+                    timestamp: 1324524509.123
+                },
+                {
+                    class:'class',
+                    source:'source', 
+                    timestamp: 1324524509.623
+                },
+            ];
             
             echoClient.addEvents('secret', events, function(err){
-                const updatedEvents = [{class:'class', source:'source', timestamp: 1324524508 }, {class:'class', source:'source', timestamp: 1324524509 }];
+                const updatedEvents = [
+                    {
+                        class:'class',
+                        source:'source',
+                        timestamp: 1324524508
+                    },
+                    {
+                        class:'class',
+                        source:'source', 
+                        timestamp: 1324524509
+                    },
+                    {
+                        class:'class',
+                        source:'source', 
+                        timestamp: 1324524510
+                    },
+                ];
                 
                 (err === null).should.be.true;
                 
