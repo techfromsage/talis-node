@@ -240,6 +240,75 @@ describe("Echo Node Client Test Suite", function(){
                 done();
             });
         });
+        it("- rounds the timestamp to nearest whole number for arrays of events", function(done){
+            var echoClient = echo.createClient({
+                echo_endpoint: endPoint
+            });
+            
+            var requestStub = sandbox.stub(request, 'post')
+            requestStub.callsFake(function (options, callback) {
+                callback(
+                    null,
+                    {statusCode: 200},
+                    {
+                        "class": "page.views",
+                        "timestamp": 1324524509,
+                        "user": "1234-5678-9012-3456",
+                        "source" : "elevate-app",
+                        "props": {
+                            "url" : "https://foo.bar/baz.html"
+                        }
+                    }
+                );
+            });
+
+            const events = [{class:'class', source:'source', timestamp: 1324524508 }, {class:'class', source:'source', timestamp: 1324524509.123 }];
+            
+            echoClient.addEvents('secret', events, function(err){
+                const updatedEvents = [{class:'class', source:'source', timestamp: 1324524508 }, {class:'class', source:'source', timestamp: 1324524509 }];
+                
+                (err === null).should.be.true;
+                
+                requestStub.callCount.should.equal(1);
+                const eventData = requestStub.firstCall.args[0].body;
+                eventData.should.containDeep(updatedEvents)
+                
+                done();
+            });
+        });
+        it("- rounds the timestamp to nearest whole number for single events", function(done){
+            var echoClient = echo.createClient({
+                echo_endpoint: endPoint
+            });
+
+            var requestStub = sandbox.stub(request, 'post')
+            requestStub.callsFake(function (options, callback) {
+                callback(
+                    null,
+                    {statusCode: 200},
+                    {
+                        "class": "page.views",
+                        "timestamp": 1324524509,
+                        "user": "1234-5678-9012-3456",
+                        "source" : "elevate-app",
+                        "props": {
+                            "url" : "https://foo.bar/baz.html"
+                        }
+                    }
+                );
+            });
+
+            echoClient.addEvents('secret', {class:'class', source:'source', timestamp: 1324524509.123}, function(err){
+
+                (err === null).should.be.true;
+
+                requestStub.callCount.should.equal(1);
+                const eventData = requestStub.firstCall.args[0].body;
+                eventData.timestamp.should.equal(1324524509)
+
+                done();
+            });
+        });
     });
 
     describe('- query analytics tests', function(){

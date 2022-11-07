@@ -155,6 +155,12 @@ function Client() {
     });
   }
 
+  function roundTimestamp(event){
+    if (!event.timestamp || Number.isInteger(event.timestamp)) return event;
+    
+    return Object.assign({}, event, { timestamp: Math.round(event.timestamp) })
+  }
+
   /**
      * Add an event or events
      * @param {string} token
@@ -167,6 +173,7 @@ function Client() {
      * @callback callback
      */
   EchoClient.prototype.addEvents = function addEvents(token, data, callback) {
+    let eventData
     if (!token) {
       throw new Error('Missing Persona token');
     }
@@ -184,6 +191,10 @@ function Client() {
       if (!data.source) {
         throw new Error('Missing field data.source');
       }
+
+      eventData = roundTimestamp(data)
+    } else {
+      eventData = data.map(roundTimestamp)
     }
 
     var requestOptions = {
@@ -192,7 +203,7 @@ function Client() {
         Accept: 'application/json',
         Authorization: 'Bearer ' + token
       },
-      body: data,
+      body: eventData,
       method: 'POST',
       json: true
     };
