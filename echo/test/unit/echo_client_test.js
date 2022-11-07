@@ -229,7 +229,7 @@ describe("Echo Node Client Test Suite", function(){
 
             echoClient.addEvents('secret', {class:'class', source:'source'}, function(err, result){
 
-                (err === null).should.be.true;
+                (err === null).should.be.true();
 
                 result.body.timestamp.should.equal(1324524509);
                 result.body.user.should.equal("1234-5678-9012-3456");
@@ -299,7 +299,7 @@ describe("Echo Node Client Test Suite", function(){
                     },
                 ];
                 
-                (err === null).should.be.true;
+                (err === null).should.be.true();
                 
                 requestStub.callCount.should.equal(1);
                 const eventData = requestStub.firstCall.args[0].body;
@@ -332,7 +332,7 @@ describe("Echo Node Client Test Suite", function(){
 
             echoClient.addEvents('secret', {class:'class', source:'source', timestamp: 1324524509.123}, function(err){
 
-                (err === null).should.be.true;
+                (err === null).should.be.true();
 
                 requestStub.callCount.should.equal(1);
                 const eventData = requestStub.firstCall.args[0].body;
@@ -442,7 +442,7 @@ describe("Echo Node Client Test Suite", function(){
             var queryAnalytics = function(){
                 return echoClient.queryAnalytics('secret', 'sum', params, false, function(err, result){
                     var firstCall = requestStub.firstCall;
-                    (err === null).should.be.true;
+                    (err === null).should.be.true();
                     requestStub.callCount.should.equal(1);
                     firstCall.args[0].method.should.equal('GET');
                     firstCall.args[0].url.should.equal(endPoint + '/1/analytics/sum?class=testclass&source=testsources&property=testproperty&interval=testinterval&group_by=testgroupby&key=testkey&value=testvalue&from=testfrom&to=testto&percentile=testpercentile&user=testuser&user.include=includeuser&user.exclude=excludeuser&filter=testfilter&filter.test=testfilter&n=testn&n.something=something');
@@ -534,11 +534,11 @@ describe("Echo Node Client Test Suite", function(){
 
             echoClient.queryAnalytics('secret', 'sum', params, false, function(err, result){
                 var firstCall = requestStub.firstCall;
-                (err === null).should.be.true;
+                (err === null).should.be.true();
                 requestStub.callCount.should.equal(1);
                 firstCall.args[0].method.should.equal('GET');
                 firstCall.args[0].headers['cache-control'].should.equal('none');
-                (result.body.results instanceof Array).should.be.true;
+                (result.body.results instanceof Array).should.be.true();
                 result.body.results.length.should.equal(2);
                 result.body.results[0].user.should.equal('8av3Jaj__vC9v9VIY_P-1w');
                 result.body.head.class.should.equal(params.class);
@@ -574,11 +574,11 @@ describe("Echo Node Client Test Suite", function(){
 
             echoClient.queryAnalytics('secret', 'sum', params, true, function(err, result){
                 var firstCall = requestStub.firstCall;
-                (err === null).should.be.true;
+                (err === null).should.be.true();
                 requestStub.callCount.should.equal(1);
                 firstCall.args[0].method.should.equal('GET');
                 firstCall.args[0].headers.should.not.have.property('cache-control');
-                (result.body.results instanceof Array).should.be.true;
+                (result.body.results instanceof Array).should.be.true();
                 result.body.results.length.should.equal(2);
                 result.body.results[0].user.should.equal('8av3Jaj__vC9v9VIY_P-1w');
                 result.body.head.class.should.equal(params.class);

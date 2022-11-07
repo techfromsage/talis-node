@@ -145,7 +145,7 @@ describe("Babel Node Client Test Suite", function(){
             babel.__set__("request", requestStub);
 
             babelClient.headTargetFeed('TARGET', 'secret', function(err, response){
-                (err === null).should.be.true;
+                (err === null).should.be.true();
                 response.headers.should.have.property('x-feed-new-items', '1');
                 done();
             });
@@ -165,7 +165,7 @@ describe("Babel Node Client Test Suite", function(){
             babel.__set__("request", requestStub);
 
             babelClient.headTargetFeed('TARGET', 'secret', {}, function(err, response){
-                (err === null).should.be.true;
+                (err === null).should.be.true();
                 response.headers.should.have.property('x-feed-new-items', '2');
                 done();
             });
@@ -320,7 +320,7 @@ describe("Babel Node Client Test Suite", function(){
 
             babelClient.getEntireTargetFeed('TARGET', 'secret', true, function(err, result){
                 requestStubSpy.callCount.should.equal(2);
-                (err === undefined).should.be.true;
+                (err === undefined).should.be.true();
                 result.feed_length.should.equal(1002);
                 result.userProfiles.user_1.first_name.should.equal('TN')
                 result.annotations.should.have.lengthOf(1002);
@@ -370,7 +370,7 @@ describe("Babel Node Client Test Suite", function(){
             babel.__set__("request", requestStub);
 
             babelClient.getTargetFeed('TARGET', 'secret', null, function(err){
-                (err === null).should.be.true;
+                (err === null).should.be.true();
                 done();
             });
         });
@@ -479,7 +479,7 @@ describe("Babel Node Client Test Suite", function(){
 
             babelClient.getTargetFeed('TARGET', 'secret', {}, function(err, result){
 
-                (err === null).should.be.true;
+                (err === null).should.be.true();
                 result.count.should.equal(2);
                 result.limit.should.equal(25);
                 result.annotations.should.have.lengthOf(2);
@@ -659,7 +659,7 @@ describe("Babel Node Client Test Suite", function(){
 
             babelClient.getFeeds(['FEED1', ['FEED2']], 'secret', function(err, result){
 
-                (err === null).should.be.true;
+                (err === null).should.be.true();
                 result.feed_length.should.equal(2);
                 result.limit.should.equal(25);
                 result.annotations.should.have.lengthOf(2);
@@ -794,7 +794,7 @@ describe("Babel Node Client Test Suite", function(){
 
             babelClient.getAnnotation("secret", "5628b931a394fb449e000247", function(err, result){
 
-                (err === null).should.be.true;
+                (err === null).should.be.true();
                 result._id.should.equal("5628b931a394fb449e000247");
                 done();
             });
@@ -931,7 +931,7 @@ describe("Babel Node Client Test Suite", function(){
 
             babelClient.getAnnotations('secret', {}, function(err, result){
 
-                (err === null).should.be.true;
+                (err === null).should.be.true();
                 result.count.should.equal(2);
                 result.limit.should.equal(25);
                 result.annotations.should.have.lengthOf(2);
@@ -1235,7 +1235,7 @@ describe("Babel Node Client Test Suite", function(){
 
             babelClient.createAnnotation('secret', {hasBody:{format:'text/plain', type:'Text'}, hasTarget:{uri:'http://example.com', type: 'Text'}, annotatedBy:'Gordon Freeman'}, {}, function(err, result){
 
-                (err === null).should.be.true;
+                (err === null).should.be.true();
 
                 result.annotatedBy.should.equal('Gordon Freeman');
                 result.hasTarget.uri.should.equal('http://example.com/uri');
@@ -1282,7 +1282,7 @@ describe("Babel Node Client Test Suite", function(){
 
             babelClient.createAnnotation('secret', {hasBody:{format:'text/plain', type:'Text'}, hasTarget:{uri:'http://example.com'}, annotatedBy:'Gordon Freeman'}, function(err, result){
 
-                (err === null).should.be.true;
+                (err === null).should.be.true();
 
                 result.annotatedBy.should.equal('Gordon Freeman');
                 result.hasTarget.uri.should.equal('http://example.com/uri');
@@ -1626,7 +1626,7 @@ describe("Babel Node Client Test Suite", function(){
             babel.__set__("request", requestMock);
 
             babelClient.updateAnnotation('secret', {_id: 'testid', hasBody:{format:'text/plain', type:'Text'}, hasTarget:{uri:'http://example.com', type: 'Text'}, annotatedBy:'Gordon Freeman'}, function(err, result){
-                (err === null).should.be.true;
+                (err === null).should.be.true();
                 result.annotatedBy.should.equal('Gordon Freeman');
                 result.hasTarget.uri.should.equal('http://example.com/uri');
                 result.hasBody.uri.should.equal('http://example.com/another/uri');
