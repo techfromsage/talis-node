@@ -11,15 +11,15 @@ describe('hash-key', function() {
         [
             {
                 key: 'key',
-                hash: 'v6DpRaPd9vWLlfoxg3ke0Q==',
+                hash: 'PG4LipwVIkqCKLmpjKFTHQ==',
             },
             {
                 key: 'data',
-                hash: 'U5CAuieM9M9NsuSjJkL/MA=='
+                hash: 'jXd/OF09/siBXSD3SWAm3A=='
             },
             {
                 key: 'www.talis.com',
-                hash: 'MLXjuG895/5cv8ynX60Yyg=='
+                hash: '+ndbTPexWjfadqriJyG+vA=='
             }
         ].forEach(function(test) {
             hashKey(test.key).should.equal(test.hash);     
