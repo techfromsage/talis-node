@@ -1,6 +1,9 @@
 # talis-node
 [![build status](https://travis-ci.org/talis/talis-node.svg?branch=master)](https://travis-ci.org/talis/talis-node)
 
+foo!
+
+
 # Development Version - Not For General Use
 
 This is a development version of the new talis-node version. It is not yet intended for general use. This early version pulls existing individual client libraries into one single library with minimal changes.
