@@ -1,5 +1,4 @@
 # talis-node
-[![build status](https://travis-ci.org/talis/talis-node.svg?branch=master)](https://travis-ci.org/talis/talis-node)
 
 # Development Version - Not For General Use
 
