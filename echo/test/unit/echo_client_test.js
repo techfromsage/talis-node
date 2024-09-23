@@ -108,6 +108,7 @@ describe("Echo Node Client Test Suite", function(){
 
             var requestStub = sandbox.stub(request, 'post')
             requestStub.callsFake(function (options, callback) {
+                options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
                 if(!options.body){
                     var error = new Error('Missing field: options.body');
                     callback(error);
@@ -128,6 +129,7 @@ describe("Echo Node Client Test Suite", function(){
 
             var requestStub = sandbox.stub(request, 'post')
             requestStub.callsFake(function (options, callback) {
+                options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
                 if(!options.method){
                     var error = new Error('Missing field: options.method');
                     callback(error);
@@ -148,6 +150,7 @@ describe("Echo Node Client Test Suite", function(){
 
             var requestStub = sandbox.stub(request, 'post')
             requestStub.callsFake(function (options, callback) {
+                options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
                 if(options.method !== 'POST'){
                     var error = new Error('Invalid field: options.method');
                     callback(error);
@@ -168,6 +171,7 @@ describe("Echo Node Client Test Suite", function(){
 
             var requestStub = sandbox.stub(request, 'post')
             requestStub.callsFake(function (options, callback) {
+                options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
                 if(!options.json){
                     var error = new Error('Missing field: options.json');
                     callback(error);
@@ -188,6 +192,7 @@ describe("Echo Node Client Test Suite", function(){
 
             var requestStub = sandbox.stub(request, 'post')
             requestStub.callsFake(function (options, callback) {
+                options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
                 callback(
                   null,
                   {statusCode: 401},
@@ -212,6 +217,7 @@ describe("Echo Node Client Test Suite", function(){
 
             var requestStub = sandbox.stub(request, 'post')
             requestStub.callsFake(function (options, callback) {
+                options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
                 callback(
                   null,
                   {statusCode: 200},
@@ -314,6 +320,7 @@ describe("Echo Node Client Test Suite", function(){
 
             var requestStub = sandbox.stub(request, 'get')
             requestStub.callsFake(function (options, callback) {
+                options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
                 var data = "{\"head\": {\"type\": \"sum\",\"class\": \"player.timer.2\",\"property\": \"interval_with_decay\",\"group_by\": \"user\",\"filter\": {\"module_id\": \"5847ed0ef81ebd1f1b000001\",\"resource_id\": \"5899a87fd42410f2c9000001\"},\"from\": \"2016-08-29T00:00:00\",\"to\": \"2017-05-18T00:00:00\",\"count\": 2},\"results\": [{\"user\": \"8av3Jaj__vC9v9VIY_P-1w\",\"interval_with_decay\": 182920},{\"user\": \"d17T05nNTjG50sAp_R3RvQ\",\"interval_with_decay\": 21315}]}";
                 callback(null, {statusCode: 200}, data);
             });
@@ -362,6 +369,7 @@ describe("Echo Node Client Test Suite", function(){
 
             var requestStub = sandbox.stub(request, 'get')
             requestStub.callsFake(function (options, callback) {
+                options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
                 callback(new Error('Error communicating with Echo'));
             });
 
@@ -393,6 +401,7 @@ describe("Echo Node Client Test Suite", function(){
 
             var requestStub = sandbox.stub(request, 'get')
             requestStub.callsFake(function (options, callback) {
+                options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
                 callback(
                   null,
                   {statusCode: 401},
@@ -417,6 +426,7 @@ describe("Echo Node Client Test Suite", function(){
 
             var requestStub = sandbox.stub(request, 'get')
             requestStub.callsFake(function (options, callback) {
+                options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
                 var data = "{\"head\": {\"type\": \"sum\",\"class\": \"player.timer.2\",\"property\": \"interval_with_decay\",\"group_by\": \"user\",\"filter\": {\"module_id\": \"5847ed0ef81ebd1f1b000001\"},\"user\": {\"exclude\": \"qVyfsQhlMY0T2_Bl7eotrg\"},\"from\": \"2017-02-01T00:00:00\",\"to\": \"2017-02-13T00:00:00\",\"count\": 2},\"results\": [{\"user\": \"8av3Jaj__vC9v9VIY_P-1w\",\"interval_with_decay\": 182920},{\"user\": \"d17T05nNTjG50sAp_R3RvQ\",\"interval_with_decay\": 21315}]}";
                 callback(null, {statusCode: 200}, data);
             });
@@ -457,6 +467,7 @@ describe("Echo Node Client Test Suite", function(){
 
             var requestStub = sandbox.stub(request, 'get')
             requestStub.callsFake(function (options, callback) {
+                options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
                 var data = "{\"head\": {\"type\": \"sum\",\"class\": \"player.timer.2\",\"property\": \"interval_with_decay\",\"group_by\": \"user\",\"filter\": {\"module_id\": \"5847ed0ef81ebd1f1b000001\"},\"user\": {\"exclude\": \"qVyfsQhlMY0T2_Bl7eotrg\"},\"from\": \"2017-02-01T00:00:00\",\"to\": \"2017-02-13T00:00:00\",\"count\": 2},\"results\": [{\"user\": \"8av3Jaj__vC9v9VIY_P-1w\",\"interval_with_decay\": 182920},{\"user\": \"d17T05nNTjG50sAp_R3RvQ\",\"interval_with_decay\": 21315}]}";
                 callback(null, {statusCode: 200}, data);
             });
@@ -499,6 +510,7 @@ describe("Echo Node Client Test Suite", function(){
 
             var requestStub = sandbox.stub(request, 'get')
             requestStub.callsFake(function (options, callback) {
+                options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
                 callback(null, {statusCode: 200}, data);
             });
 
@@ -532,6 +544,7 @@ describe("Echo Node Client Test Suite", function(){
 
             var requestStub = sandbox.stub(request, 'get')
             requestStub.callsFake(function (options, callback) {
+                options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
                 callback(null, {statusCode: 400}, data);
             });
 
@@ -565,6 +578,7 @@ describe("Echo Node Client Test Suite", function(){
 
             var requestStub = sandbox.stub(request, 'get')
             requestStub.callsFake(function (options, callback) {
+                options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
                 callback(null, {statusCode: 400}, data);
             });
 

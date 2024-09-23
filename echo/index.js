@@ -5,6 +5,8 @@ var _ = require('lodash');
 var codesAndLabels = require('./lib/codes-labels').codesAndLabels;
 var httpStatusToCode = require('./lib/codes-labels').httpStatusToCode;
 
+var clientVer = require('../package.json').version || 'unknown';
+
 // log severities
 var DEBUG = 'debug';
 var ERROR = 'error';
@@ -65,6 +67,9 @@ function queryStringParams(params) {
 
 function Client() {
   var config = {};
+  var userAgent = (process && _.has(process, ["version", "env.NODE_ENV"])) ? "talis-node/" +
+        clientVer + " (nodejs/" + process.version + "; NODE_ENV=" +
+        process.env.NODE_ENV + ")" : "talis-node/" + clientVer;
 
   /**
      * Log wrapping functions
@@ -190,7 +195,8 @@ function Client() {
       url: config.echo_endpoint + '/1/events',
       headers: {
         Accept: 'application/json',
-        Authorization: 'Bearer ' + token
+        Authorization: 'Bearer ' + token,
+        'User-Agent': userAgent,
       },
       body: data,
       method: 'POST',
@@ -267,7 +273,8 @@ function Client() {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + token
+        Authorization: 'Bearer ' + token,
+        'User-Agent': userAgent,
       }
     };
 
