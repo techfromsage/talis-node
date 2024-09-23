@@ -6,6 +6,8 @@ var _ = require('lodash'),
     md5 = require('md5'),
     querystring = require('querystring');
 
+var clientVer = require('../package.json').version || 'unknown';
+
 // log severities
 var DEBUG = "debug";
 var ERROR = "error";
@@ -35,6 +37,10 @@ var BabelClient = function babelClient(config) {
     }
 
     this.config.babel_hostname = this.config.babel_host.split('://', 2)[1];
+
+    this.userAgent = (process && _.has(process, ["version", "env.NODE_ENV"])) ? "talis-node/" +
+        clientVer + " (nodejs/" + process.version + "; NODE_ENV=" +
+        process.env.NODE_ENV + ")" : "talis-node/" + clientVer;
 };
 
 /**
@@ -71,7 +77,8 @@ BabelClient.prototype.headTargetFeed = function headTargetFeed(target, token, pa
         headers: {
             'Accept': 'application/json',
             'Authorization':'Bearer '+token,
-            'Host': this.config.babel_hostname
+            'Host': this.config.babel_hostname,
+            'User-Agent': this.userAgent,
         }
     };
 
@@ -133,6 +140,7 @@ BabelClient.prototype.getEntireTargetFeed = async function (target, token, hydra
                 'Accept': 'application/json',
                 'Authorization':'Bearer '+ token,
                 'Host': this.config.babel_hostname,
+                'User-Agent': this.userAgent,
             },
         };
 
@@ -219,7 +227,8 @@ BabelClient.prototype.getTargetFeed = function getTargetFeed(target, token, hydr
         headers: {
             'Accept': 'application/json',
             'Authorization':'Bearer '+token,
-            'Host': this.config.babel_hostname
+            'Host': this.config.babel_hostname,
+            'User-Agent': this.userAgent,
         }
     };
 
@@ -261,7 +270,8 @@ BabelClient.prototype.getFeeds = function getFeeds(feeds, token, callback) {
         headers: {
             'Accept': 'application/json',
             'Authorization': 'Bearer ' + token,
-            'Host': this.config.babel_hostname
+            'Host': this.config.babel_hostname,
+            'User-Agent': this.userAgent,
         }
     };
 
@@ -299,7 +309,8 @@ BabelClient.prototype.getAnnotation = function getAnnotation(token, id, callback
         headers: {
             'Accept': 'application/json',
             'Authorization':'Bearer '+token,
-            'Host': this.config.babel_hostname
+            'Host': this.config.babel_hostname,
+            'User-Agent': this.userAgent,
         }
     };
 
@@ -343,7 +354,8 @@ BabelClient.prototype.getAnnotations = function getAnnotations(token, querystrin
         headers: {
             'Accept': 'application/json',
             'Authorization':'Bearer '+token,
-            'Host': this.config.babel_hostname
+            'Host': this.config.babel_hostname, 
+            'User-Agent': this.userAgent,
         }
     };
 
@@ -440,7 +452,8 @@ BabelClient.prototype.createAnnotation = function createAnnotation(token, data, 
         headers: {
             'Accept': 'application/json',
             'Authorization':'Bearer '+token,
-            'Host': this.config.babel_hostname
+            'Host': this.config.babel_hostname,
+            'User-Agent': this.userAgent,
         }
     };
 
@@ -542,7 +555,8 @@ BabelClient.prototype.updateAnnotation = function updateAnnotation(token, data, 
         headers: {
             'Accept': 'application/json',
             'Authorization': 'Bearer ' + token,
-            'Host': this.config.babel_hostname
+            'Host': this.config.babel_hostname,
+            'User-Agent': this.userAgent,
         }
     };
 
@@ -583,7 +597,8 @@ BabelClient.prototype.deleteAnnotation = function deleteAnnotation(token, annota
         headers: {
             'Accept': 'application/json',
             'Authorization': 'Bearer ' + token,
-            'Host': this.config.babel_hostname
+            'Host': this.config.babel_hostname,
+            'User-Agent': this.userAgent,
         }
     };
 

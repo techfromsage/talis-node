@@ -76,6 +76,7 @@ describe("Babel Node Client Test Suite", function(){
                 babel_port:3000
             });
             var requestStub = function(options, callback){
+                options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
                 callback(new Error('Error communicating with Babel'));
             };
 
@@ -97,6 +98,7 @@ describe("Babel Node Client Test Suite", function(){
                 babel_port:3000
             });
             var requestStub = function(options, callback){
+                options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
                 callback(null, {statusCode:401});
             };
 
@@ -118,6 +120,7 @@ describe("Babel Node Client Test Suite", function(){
                 babel_port:3000
             });
             var requestStub = function(options, callback){
+                options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
                 callback(null, {statusCode:404});
             };
 
@@ -139,6 +142,7 @@ describe("Babel Node Client Test Suite", function(){
             });
 
             var requestStub = function(options, callback){
+                options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
                 callback(null, {statusCode:204, headers:{'x-feed-new-items': '1'}});
             };
 
@@ -159,6 +163,7 @@ describe("Babel Node Client Test Suite", function(){
             });
 
             var requestStub = function(options, callback){
+                options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
                 callback(null, {statusCode:204, headers:{'x-feed-new-items': '2'}});
             };
 
@@ -364,6 +369,7 @@ describe("Babel Node Client Test Suite", function(){
             });
 
             var requestStub = function(options, callback){
+                options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
                 callback(null, {}, JSON.stringify({}));
             };
 
@@ -383,6 +389,7 @@ describe("Babel Node Client Test Suite", function(){
                 babel_port:3000
             });
             var requestStub = function(options, callback){
+                options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
                 callback(new Error('Error communicating with Babel'));
             };
 
@@ -405,6 +412,7 @@ describe("Babel Node Client Test Suite", function(){
                 babel_port:3000
             });
             var requestStub = function(options, callback){
+                options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
                 callback(null, {statusCode:401}, JSON.stringify({error:"invalid_token", error_description:"The token is invalid or has expired"}));
             };
 
@@ -428,6 +436,7 @@ describe("Babel Node Client Test Suite", function(){
                 babel_port:3000
             });
             var requestStub = function(options, callback){
+                options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
                 callback(null, {}, JSON.stringify({"error":"feed_not_found", "error_description":"Feed not found"}));
             };
 
@@ -451,6 +460,7 @@ describe("Babel Node Client Test Suite", function(){
             });
 
             var requestStub = function(options, callback){
+                options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
                 callback(null, {}, JSON.stringify({
                     "count":2,
                     "limit":25,
@@ -495,6 +505,7 @@ describe("Babel Node Client Test Suite", function(){
             });
 
             var requestStub = function(options, callback){
+                options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
                 callback(null, {}, null);
             };
 
@@ -556,6 +567,7 @@ describe("Babel Node Client Test Suite", function(){
                 babel_port:3000
             });
             var requestStub = function(options, callback){
+                options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
                 callback(new Error('Error communicating with Babel'));
             };
 
@@ -578,6 +590,7 @@ describe("Babel Node Client Test Suite", function(){
                 babel_port:3000
             });
             var requestStub = function(options, callback){
+                options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
                 callback(null, {statusCode:401}, JSON.stringify({error:"invalid_token", error_description:"The token is invalid or has expired"}));
             };
 
@@ -601,6 +614,7 @@ describe("Babel Node Client Test Suite", function(){
                 babel_port:3000
             });
             var requestStub = function(options, callback){
+                options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
                 callback(null, {}, JSON.stringify({"error":"feed_not_found", "error_description":"Feed not found"}));
             };
 
@@ -624,6 +638,7 @@ describe("Babel Node Client Test Suite", function(){
             });
 
             var requestStub = function(options, callback){
+                options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
                 callback(null, {}, JSON.stringify({
                     "feed_length":2,
                     "limit":25,
@@ -675,6 +690,7 @@ describe("Babel Node Client Test Suite", function(){
             });
 
             var requestStub = function(options, callback){
+                options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
                 callback(null, {}, null);
             };
 
@@ -724,6 +740,7 @@ describe("Babel Node Client Test Suite", function(){
                 babel_port:3000
             });
             var requestStub = function(options, callback){
+                options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
                 callback(null, {statusCode:401}, JSON.stringify({error:"invalid_token", error_description:"The token is invalid or has expired"}));
             };
 
@@ -746,6 +763,7 @@ describe("Babel Node Client Test Suite", function(){
                 babel_port:3000
             });
             var requestStub = function(options, callback){
+                options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
                 callback(new Error("Error communicating with Babel"));
             };
 
@@ -769,6 +787,7 @@ describe("Babel Node Client Test Suite", function(){
             });
 
             var requestMock = function(options, callback){
+                options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
                 callback(null, {}, JSON.stringify({
                     "__v": 0,
                     "annotatedBy": "bp",
@@ -808,6 +827,7 @@ describe("Babel Node Client Test Suite", function(){
             });
 
             var requestStub = function(options, callback){
+                options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
                 callback(null, {}, null);
             };
 
@@ -857,6 +877,7 @@ describe("Babel Node Client Test Suite", function(){
                 babel_port:3000
             });
             var requestStub = function(options, callback){
+                options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
                 callback(null, {statusCode:401}, JSON.stringify({error:"invalid_token", error_description:"The token is invalid or has expired"}));
             };
 
@@ -880,6 +901,7 @@ describe("Babel Node Client Test Suite", function(){
                 babel_port:3000
             });
             var requestStub = function(options, callback){
+                options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
                 callback(new Error('Error communicating with Babel'));
             };
 
@@ -903,6 +925,7 @@ describe("Babel Node Client Test Suite", function(){
             });
 
             var requestMock = function(options, callback){
+                options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
                 callback(null, {}, JSON.stringify({
                     "count":2,
                     "limit":25,
@@ -947,7 +970,8 @@ describe("Babel Node Client Test Suite", function(){
             });
 
             var requestStub = function(options, callback){
-               callback(null, {}, null);
+                options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
+                callback(null, {}, null);
             };
 
             babel.__set__("request", requestStub);
@@ -1093,6 +1117,7 @@ describe("Babel Node Client Test Suite", function(){
             });
             var requestStub = {
                 post:function(options, callback){
+                    options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
                     var error = new Error('The token is invalid or has expired');
                     error.http_code = 401;
                     callback(error);
@@ -1120,6 +1145,7 @@ describe("Babel Node Client Test Suite", function(){
             });
             var requestStub = {
                 post:function(options, callback){
+                    options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
                     var error = new Error('Error communicating with Babel');
                     callback(error);
                 }
@@ -1145,7 +1171,8 @@ describe("Babel Node Client Test Suite", function(){
             });
             var requestStub = {
                 post:function(options, callback){
-                   var response = {statusCode: 400};
+                    options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
+                    var response = {statusCode: 400};
                     callback(null, response, {body:'', message:'Bad Request'});
                 }
             };
@@ -1172,6 +1199,7 @@ describe("Babel Node Client Test Suite", function(){
           });
           var requestStub = {
             post: function (options, callback) {
+              options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
               callback(null, { statusCode: 502 }, { message: "Bad Gateway" });
             },
           };
@@ -1208,6 +1236,7 @@ describe("Babel Node Client Test Suite", function(){
 
             var requestMock = {};
             requestMock.post = function(options, callback){
+                options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
                 callback(null, {statusCode: 201}, {
                     __v: 0,
                     annotatedBy: 'Gordon Freeman',
@@ -1256,6 +1285,7 @@ describe("Babel Node Client Test Suite", function(){
 
             var requestMock = {};
             requestMock.post = function(options, callback){
+                options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
                 callback(null, {statusCode: 201}, {
                     __v: 0,
                     annotatedBy: 'Gordon Freeman',
@@ -1489,6 +1519,7 @@ describe("Babel Node Client Test Suite", function(){
             });
             var requestStub = {
                 put:function(options, callback){
+                    options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
                     var error = new Error('The token is invalid or has expired');
                     error.http_code = 401;
                     callback(error);
@@ -1515,6 +1546,7 @@ describe("Babel Node Client Test Suite", function(){
             });
             var requestStub = {
                 put:function(options, callback){
+                    options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
                     var error = new Error('Error communicating with Babel');
                     callback(error);
                 }
@@ -1539,6 +1571,7 @@ describe("Babel Node Client Test Suite", function(){
             });
             var requestStub = {
                 put:function(options, callback){
+                    options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
                     var response = {statusCode: 400};
                     callback(null, response, {body:'', message:'Bad Request'});
                 }
@@ -1565,6 +1598,7 @@ describe("Babel Node Client Test Suite", function(){
           });
           var requestStub = {
             put: function (options, callback) {
+              options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
               callback(null, { statusCode: 400 }, { message: "Bad Gateway" });
             },
           };
@@ -1600,6 +1634,7 @@ describe("Babel Node Client Test Suite", function(){
 
             var requestMock = {};
             requestMock.put = function(options, callback){
+                options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
                 callback(null, {statusCode: 200}, {
                     __v: 0,
                     annotatedBy: 'Gordon Freeman',
@@ -1668,6 +1703,7 @@ describe("Babel Node Client Test Suite", function(){
             });
             var requestStub = {
                 delete:function(options, callback){
+                    options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
                     var error = new Error('Error communicating with Babel');
                     callback(error);
                 }
