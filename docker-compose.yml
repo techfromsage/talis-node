@@ -8,17 +8,3 @@ services:
     restart: always
     networks:
       - default
-  talis_node_dev:
-    image: talis/talis-node
-    links:
-      - redis
-    volumes:
-      - ".:/var/talis-node"
-    command: "/bin/bash"
-    environment:
-      REDIS_TEST_HOST: "redis"
-      REDIS_TEST_PORT: 6379
-    networks:
-      - default
-
-
