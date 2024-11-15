@@ -3,7 +3,7 @@
 var should = require("should");
 var assert = require("assert");
 var persona = require("../../index");
-var cryptojs = require("crypto-js");
+var crypto = require("crypto");
 var runBeforeEach = require("../utils").beforeEach;
 var runAfterEach = require("../utils").afterEach;
 var leche = require("leche");
@@ -91,7 +91,7 @@ describe("Persona Client Test Suite - Presigned URL Tests", function() {
                 var personaClient = persona.createClient("test-suite",personaClientConfig);
 
                 var urlToSign = 'http://192.168.10.62:3000/player?shortcode=google&expires=1395160411633';
-                var expectedHash = cryptojs.HmacSHA256(urlToSign, secret);
+                var expectedHash = crypto.createHmac('sha256', secret).update(urlToSign).digest('hex');
 
                 personaClient.presignUrl(urlToSign, secret, null, function(err, result){
                     if(err) return done(err);
@@ -126,7 +126,7 @@ describe("Persona Client Test Suite - Presigned URL Tests", function() {
 
                 var urlWithExp = baseUrl + '&expires=' + expiry;
 
-                var expectedHash = cryptojs.HmacSHA256(urlWithExp, secret);
+                var expectedHash = crypto.createHmac('sha256', secret).update(urlWithExp).digest('hex');
 
                 var expectedURL = baseUrl + '&expires=' + expiry + '&signature=' + expectedHash;
 
@@ -143,7 +143,7 @@ describe("Persona Client Test Suite - Presigned URL Tests", function() {
                 var personaClient = persona.createClient("test-suite",personaClientConfig);
 
                 var urlToSign = 'http://192.168.10.62:3000/player?shortcode=google&expires=1395160411633#/modules/52d01975d705e4730100000a/resources/5322e5413c53585456000006';
-                var expectedHash = cryptojs.HmacSHA256(urlToSign, secret);
+                var expectedHash = crypto.createHmac('sha256', secret).update(urlToSign).digest('hex');
                 var expectedUrl = 'http://192.168.10.62:3000/player?shortcode=google&expires=1395160411633&signature=' + expectedHash + '#/modules/52d01975d705e4730100000a/resources/5322e5413c53585456000006';
 
                 personaClient.presignUrl(urlToSign, secret, null, function(err, result){
@@ -183,7 +183,7 @@ describe("Persona Client Test Suite - Presigned URL Tests", function() {
 
                 var urlWithExp = baseUrl + '&expires=' + expiry + urlHash;
 
-                var expectedHash = cryptojs.HmacSHA256(urlWithExp, secret);
+                var expectedHash = crypto.createHmac('sha256', secret).update(urlWithExp).digest('hex');
 
                 var expectedURL = baseUrl + '&expires=' + expiry + '&signature=' + expectedHash + urlHash;
 
@@ -231,7 +231,7 @@ describe("Persona Client Test Suite - Presigned URL Tests", function() {
 
                 var urlWithExp = baseUrl + '?expires=' + expiry;
 
-                var hash = cryptojs.HmacSHA256(urlWithExp, secret);
+                var hash = crypto.createHmac('sha256', secret).update(urlWithExp).digest('hex');
 
                 var urlToValidate = baseUrl + '?expires=' + expiry + '&signature=' + hash;
 
@@ -252,7 +252,7 @@ describe("Persona Client Test Suite - Presigned URL Tests", function() {
 
                 var urlWithExp = baseUrl + '&expires=' + expiry + urlHash;
 
-                var hash = cryptojs.HmacSHA256(urlWithExp, secret);
+                var hash = crypto.createHmac('sha256', secret).update(urlWithExp).digest('hex');
 
                 var urlToValidate = baseUrl + '&expires=' + expiry + '&signature=' + hash + urlHash;
 
@@ -269,7 +269,7 @@ describe("Persona Client Test Suite - Presigned URL Tests", function() {
                 var urlHash = '#/modules/52d01975d705e4730100000a/resources/5322e5413c53585456000006';
                 var baseUrl = 'http://192.168.10.62:3000/player?shortcode=google';
                 var urlToSign = baseUrl + urlHash;
-                var hash = cryptojs.HmacSHA256(urlToSign, secret);
+                var hash = crypto.createHmac('sha256', secret).update(urlToSign).digest('hex');
 
                 var urlToValidate = baseUrl + '&signature=' + hash + urlHash;
 
@@ -290,7 +290,7 @@ describe("Persona Client Test Suite - Presigned URL Tests", function() {
 
                 var urlWithExp = baseUrl + '&expires=' + expiry + urlHash;
 
-                var hash = cryptojs.HmacSHA256(urlWithExp, secret);
+                var hash = crypto.createHmac('sha256', secret).update(urlWithExp).digest('hex');
 
                 var urlToValidate = baseUrl + '&expires=' + expiry + '&signature=' + hash + urlHash;
 
@@ -311,7 +311,7 @@ describe("Persona Client Test Suite - Presigned URL Tests", function() {
 
                 var urlWithExp = baseUrl + '&expiry=' + expiry + urlHash + '23'; // add additional data that will cause an invalid hash to be generated
 
-                var hash = cryptojs.HmacSHA256(urlWithExp, secret);
+                var hash = crypto.createHmac('sha256', secret).update(urlWithExp).digest('hex');
 
                 var urlToValidate = baseUrl + '&expiry=' + expiry + '&signature=' + hash + urlHash;
 
