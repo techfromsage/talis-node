@@ -1,4 +1,4 @@
-var cryptojs = require("crypto-js");
+var crypto = require("crypto");
 var url = require("url");
 var querystring = require("querystring");
 var _ = require("lodash");
@@ -486,7 +486,7 @@ PersonaClient.prototype.presignUrl = function (urlToSign, secret, expires, callb
     }
 
     // generate a hash by re-signing the fullURL we where passed but with the 'signature' parameter removed
-    var hash = cryptojs.HmacSHA256(urlToSign, secret);
+    var hash = crypto.createHmac('sha256', secret).update(urlToSign).digest('hex');
 
     // now insert the hash into the query string
     var signedUrl = parsedURL.protocol + '//' + parsedURL.host + parsedURL.path + '&signature=' + hash + (parsedURL.hash ? parsedURL.hash : '');
@@ -521,7 +521,7 @@ PersonaClient.prototype.isPresignedUrlValid = function (presignedUrl, secret) {
         var presignedUrlMinusSignature = presignedUrl.replace('&signature=' + signature, '');
         this.debug("presignedUrl minus signature: " + presignedUrlMinusSignature);
         // generate a hash by re-signing the fullURL we where passed but with the 'signature' parameter removed
-        var hash = cryptojs.HmacSHA256(presignedUrlMinusSignature, secret);
+        var hash = crypto.createHmac('sha256', secret).update(presignedUrlMinusSignature).digest('hex');
         this.debug("hash generated for presignedurl: " + hash);
 
         // check if the hash we created matches the passed signature

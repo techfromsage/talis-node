@@ -145,7 +145,7 @@ describe("Persona Client Test Suite - Token Validation Tests", function() {
                 audience: "standard_user"
             };
 
-            jwt.sign(payload, privateKey, jwtSigningOptions, function(token) {
+            jwt.sign(payload, privateKey, jwtSigningOptions, function(err, token) {
                 var req = _getStubRequest(token, null);
                 var res = _getStubResponse();
 
@@ -184,7 +184,7 @@ describe("Persona Client Test Suite - Token Validation Tests", function() {
                 audience: "standard_user"
             };
 
-            jwt.sign(payload, privateKey, jwtSigningOptions, function(token) {
+            jwt.sign(payload, privateKey, jwtSigningOptions, function(err, token) {
                 var req = _getStubRequest(token, null);
                 req.header = function(key) {
                     return (key === "X-Request-Id") ? "specific-id" : null;
@@ -215,7 +215,7 @@ describe("Persona Client Test Suite - Token Validation Tests", function() {
                 audience: "standard_user"
             };
 
-            jwt.sign(payload, privateKey, jwtSigningOptions, function(token) {
+            jwt.sign(payload, privateKey, jwtSigningOptions, function(err, token) {
                 var req = _getStubRequest(token, "standard_user");
                 var res = _getStubResponse();
 
@@ -254,7 +254,7 @@ describe("Persona Client Test Suite - Token Validation Tests", function() {
                 audience: "standard_user"
             };
 
-            jwt.sign(payload, privateKey, jwtSigningOptions, function(token) {
+            jwt.sign(payload, privateKey, jwtSigningOptions, function(err, token) {
                 var req = _getStubRequest(token, "wibble");
                 var res = _getStubResponse();
 
@@ -296,7 +296,7 @@ describe("Persona Client Test Suite - Token Validation Tests", function() {
                 audience: "standard_user"
             };
 
-            jwt.sign(payload, privateKey, jwtSigningOptions, function(token) {
+            jwt.sign(payload, privateKey, jwtSigningOptions, function(err, token) {
                 var req = _getStubRequest(token, "standard_user");
                 var res = _getStubResponse();
 
@@ -333,7 +333,7 @@ describe("Persona Client Test Suite - Token Validation Tests", function() {
                 audience: "super_user"
             };
 
-            jwt.sign(payload, privateKey, jwtSigningOptions, function(token) {
+            jwt.sign(payload, privateKey, jwtSigningOptions, function(err, token) {
                 var req = _getStubRequest(token, "other_scope");
                 var res = _getStubResponse();
 
@@ -372,7 +372,7 @@ describe("Persona Client Test Suite - Token Validation Tests", function() {
                 audience: "super_user"
             };
 
-            jwt.sign(payload, privateKey, jwtSigningOptions, function(token) {
+            jwt.sign(payload, privateKey, jwtSigningOptions, function(err, token) {
                 var req = _getStubRequest(token, "other_scope,super_user");
                 var res = _getStubResponse();
 
@@ -409,7 +409,7 @@ describe("Persona Client Test Suite - Token Validation Tests", function() {
                 audience: "fatuser"
             };
 
-            jwt.sign(payload, privateKey, jwtSigningOptions, function(token) {
+            jwt.sign(payload, privateKey, jwtSigningOptions, function(err, token) {
                 // We can't replay the recorded response as the token in that request will expire
                 nock("http://persona").head(/\/3\/oauth\/tokens\/.*\?scope=fatuser/).reply(204);
 
@@ -449,7 +449,7 @@ describe("Persona Client Test Suite - Token Validation Tests", function() {
                 audience: "fatuser"
             };
 
-            jwt.sign(payload, privateKey, jwtSigningOptions, function(token) {
+            jwt.sign(payload, privateKey, jwtSigningOptions, function(err, token) {
                 // We can't replay the recorded response as the token in that request will expire
                 nock("http://persona").head(/\/3\/oauth\/tokens\/.*\?scope=fatuser,thinuser/).reply(204);
 
@@ -489,7 +489,7 @@ describe("Persona Client Test Suite - Token Validation Tests", function() {
                 audience: "fatuser"
             };
 
-            jwt.sign(payload, privateKey, jwtSigningOptions, function(token) {
+            jwt.sign(payload, privateKey, jwtSigningOptions, function(err, token) {
                 nock("http://persona").head(/\/3\/oauth\/tokens\/.*\?scope=other_scope/).reply(204);
 
                 var req = _getStubRequest(token, "other_scope");
@@ -528,7 +528,7 @@ describe("Persona Client Test Suite - Token Validation Tests", function() {
                 audience: "fatuser"
             };
 
-            jwt.sign(payload, privateKey, jwtSigningOptions, function(token) {
+            jwt.sign(payload, privateKey, jwtSigningOptions, function(err, token) {
                 // We can't replay the recorded response as the token in that request will expire
                 nock("http://persona").head(/\/3\/oauth\/tokens\/.*\?scope=invalid/).reply(403);
 
@@ -570,7 +570,7 @@ describe("Persona Client Test Suite - Token Validation Tests", function() {
                 audience: "fatuser"
             };
 
-            jwt.sign(payload, privateKey, jwtSigningOptions, function(token) {
+            jwt.sign(payload, privateKey, jwtSigningOptions, function(err, token) {
                 // We can't replay the recorded response as the token in that request will expire
                 nock("http://persona").head(/\/3\/oauth\/tokens\/.*\?scope=fatuser/).reply(401);
 
@@ -612,7 +612,7 @@ describe("Persona Client Test Suite - Token Validation Tests", function() {
                 audience: "fatuser"
             };
 
-            jwt.sign(payload, privateKey, jwtSigningOptions, function(token) {
+            jwt.sign(payload, privateKey, jwtSigningOptions, function(err, token) {
                 // We can't replay the recorded response as the token in that request will expire
                 nock("http://persona").head(/\/3\/oauth\/tokens\/.*\?scope=fatuser/).reply(500);
 
@@ -658,7 +658,7 @@ describe("Persona Client Test Suite - Token Validation Tests", function() {
                 audience: "standard_user"
             };
 
-            jwt.sign(payload, privateKey, jwtSigningOptions, function(token) {
+            jwt.sign(payload, privateKey, jwtSigningOptions, function(err, token) {
                 var req = _getStubRequest(token, "standard_user");
                 var res = _getStubResponse();
 
@@ -695,7 +695,7 @@ describe("Persona Client Test Suite - Token Validation Tests", function() {
                 audience: "standard_user"
             };
 
-            jwt.sign(payload, privateKey, jwtSigningOptions, function(token) {
+            jwt.sign(payload, privateKey, jwtSigningOptions, function(err, token) {
                 nock('http://persona').get(/\/oauth\/keys/).reply(504);
                 var req = _getStubRequest(token, "standard_user");
                 var res = _getStubResponse();
@@ -736,7 +736,7 @@ describe("Persona Client Test Suite - Token Validation Tests", function() {
             // First make sure the cache has the key
             var cacheKey = personaClient._formatCacheKey("public_key");
             personaClient.tokenCache.set(cacheKey, publicKey);
-            jwt.sign(payload, privateKey, jwtSigningOptions, function(token) {
+            jwt.sign(payload, privateKey, jwtSigningOptions, function(err, token) {
                 var req = _getStubRequest(token, null);
                 var res = _getStubResponse();
 
@@ -809,7 +809,7 @@ describe("Persona Client Test Suite - Token Validation Tests", function() {
             var cacheKey = personaClient._formatCacheKey("public_key");
             personaClient.tokenCache.set(cacheKey, publicKey);
 
-            jwt.sign(payload, privateKey, jwtSigningOptions, function signedToken(token) {
+            jwt.sign(payload, privateKey, jwtSigningOptions, function signedToken(err, token) {
                 personaClient.listScopes(token, function listedTokenScopes(err, scopes) {
                     assert(err == null);
                     scopes.should.eql(['standard_user', 'blah']);
@@ -834,7 +834,7 @@ describe("Persona Client Test Suite - Token Validation Tests", function() {
             var cacheKey = personaClient._formatCacheKey("public_key");
             personaClient.tokenCache.set(cacheKey, publicKey);
 
-            jwt.sign(payload, privateKey, jwtSigningOptions, function signedToken(token) {
+            jwt.sign(payload, privateKey, jwtSigningOptions, function signedToken(err, token) {
                 // mock the http call to hydrate the token
                 var respPayload ={
                     expires: 0,
