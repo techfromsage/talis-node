@@ -4,8 +4,6 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "coverage": "nyc npm run test",
-    "coverage-html": "nyc --reporter=html npm run test",
     "test": "./node_modules/.bin/mocha --exit --timeout 20000 **/test/**/*.js",
     "integration-test": "./node_modules/.bin/mocha --exit --timeout 20000 **/test/integration/**/*.js",
     "unit-test": "./node_modules/.bin/mocha --exit --timeout 20000 **/test/unit/**/*.js",
@@ -31,7 +29,6 @@
     "leche": "2.2.3",
     "mocha": "5.2.0",
     "nock": "13.3.3",
-    "nyc": "17.1.0",
     "proxyquire": "2.1.0",
     "rewire": "2.1.4",
     "should": "13.2.3",
