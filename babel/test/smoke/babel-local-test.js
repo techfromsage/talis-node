@@ -162,5 +162,4 @@ describe("Babel Node Client Smoke Test Against Local Echo", function(){
       });
     });
   }
-
 });
