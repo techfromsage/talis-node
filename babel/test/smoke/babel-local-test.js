@@ -14,6 +14,19 @@ describe("Babel Node Client Smoke Test Against Local Echo", function(){
     babel_port:80
   });
 
+  var annotation = {
+    "hasBody": {
+      "type": "Text",
+      "format": "text/plain",
+      "chars": "Some annotation"
+    },
+    "hasTarget": {
+      "uri": "http://target/1234567890"
+    },
+    "annotatedBy": "1234567890",
+    "motivatedBy": "commenting",
+  };
+
   it.skip("should head taget feed", function(done){
     var target = "/modules/5d4daff5b34543fb61c7e761/resources/5f11e001dfb00d6aa4dd5153";
 
@@ -40,8 +53,6 @@ describe("Babel Node Client Smoke Test Against Local Echo", function(){
   });
 
   it("should get annotations", async function(){
-    var annotation = {"hasBody":{"type":"Text","format":"text/plain","chars":"Some annotation"},"hasTarget":{"uri":"http://target/1234567890"},"annotatedBy":"1234567890","motivatedBy":"commenting"};
-
     var createResult = await createAnnotation(token, annotation);
     await sleep(1000);
     var getResult = await getAnnotation(token, createResult._id);
@@ -55,7 +66,6 @@ describe("Babel Node Client Smoke Test Against Local Echo", function(){
   });
 
   it("should create, update and delete annotation", async function(){
-    var annotation = {"hasBody":{"type":"Text","format":"text/plain","chars":"Some annotation"},"hasTarget":{"uri":"http://target/1234567890"},"annotatedBy":"1234567890","motivatedBy":"commenting"};
 
     var createResult = await createAnnotation(token, annotation);
 
@@ -71,7 +81,10 @@ describe("Babel Node Client Smoke Test Against Local Echo", function(){
     var getOneResult = await getAnnotation(token, createResult._id);
     getOneResult.hasBody.chars.should.equal("Some annotation");
 
-    var updatedAnnotation = {"_id":createResult._id, "hasBody":{"type":"Text","format":"text/plain","chars":"Some updated annotation"},"hasTarget":{"uri":"http://target/1234567890"},"annotatedBy":"1234567890","motivatedBy":"updating commenting"};
+    var updatedAnnotation = annotation;
+    updatedAnnotation._id = createResult._id;
+    updatedAnnotation.hasBody.chars = "Some updated annotation";
+    updatedAnnotation.motivatedBy = "updating commenting";
 
     var updateResult = await updateAnnotation(token, updatedAnnotation);
     updateResult.hasBody.chars.should.equal("Some updated annotation");
@@ -82,7 +95,7 @@ describe("Babel Node Client Smoke Test Against Local Echo", function(){
     var getTwoResult = await getAnnotation(token, createResult._id);
     getTwoResult.hasBody.chars.should.equal("Some updated annotation");
 
-    var deleteResult = await deleteAnnotation(token, createResult._id);
+    await deleteAnnotation(token, createResult._id);
 
     await sleep(1000);
 
