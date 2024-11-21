@@ -27,29 +27,41 @@ describe("Babel Node Client Smoke Test Against Local Echo", function(){
     "motivatedBy": "commenting",
   };
 
-  it.skip("should head taget feed", function(done){
-    var target = "/modules/5d4daff5b34543fb61c7e761/resources/5f11e001dfb00d6aa4dd5153";
-
+  it("should head taget feed", async function(){
+    var target = "http://target/1234567890";
+    var getFeedResult = await getTargetFeed(target, token, true, {limit: 1});
+    console.log('result:', result);
     var params = {
-      delta_token: 1,
+      delta_token: getFeedResult.delta_token,
     };
 
-    babelClient.headTargetFeed(target, token, params, function(err, response){
-      console.log('err:', err);
-      console.log('response:', response);
-      (err === null).should.be.true;
-      response.headers.should.have.property('x-feed-new-items', '1');
-      done();
-    });
+    var result = await headTargetFeed(target, token, params);
+
+    result.should.have.property('body');
   });
-  it("should get entire target feed", function(done){
-    done();
+
+  it("should get entire target feed", async function(){
+    var target = "http://target/1234567890";
+    var result = await getEntireTargetFeed(target, token, true, {limit: 1});
+
+    result.should.have.property('feed_length');
+    result.should.have.property('annotations');
   });
-  it("should get target feed", function(done){
-    done();
+
+  it("should get target feed", async function(){
+    var target = "http://target/1234567890";
+    var result = await getTargetFeed(target, token, true, {limit: 1});
+
+    result.should.have.property('feed_length');
+    result.should.have.property('annotations');
+    result.annotations[0].should.have.property('annotatedBy', '1234567890');
   });
-  it("should get feeds", function(done){
-    done();
+
+  it("should get feeds", async function(){
+    var result = await getFeeds(['users:1234567890:activity'], token);
+
+    result.feeds[0].should.have.property('feed_id', 'users:1234567890:activity');
+    result.feeds[0].should.have.property('status', 'success');
   });
 
   it("should get annotations", async function(){
@@ -154,6 +166,54 @@ describe("Babel Node Client Smoke Test Against Local Echo", function(){
   function deleteAnnotation(token, id){
     return new Promise((resolve, reject) => {
       babelClient.deleteAnnotation(token, id, function(err, result){
+        if(err){
+          reject(err);
+        }else{
+          resolve(result);
+        }
+      });
+    });
+  }
+
+  function getFeeds(feeds, token){
+    return new Promise((resolve, reject) => {
+      babelClient.getFeeds(feeds,token,function(err, result){
+        if(err){
+          reject(err);
+        }else{
+          resolve(result);
+        }
+      });
+    });
+  }
+
+  function getTargetFeed(target, token, hydrate, params){
+    return new Promise((resolve, reject) => {
+      babelClient.getTargetFeed(target, token, hydrate, params, function(err, result){
+        if(err){
+          reject(err);
+        }else{
+          resolve(result);
+        }
+      });
+    });
+  }
+ 
+  function getEntireTargetFeed(target, token, hydrate){
+    return new Promise((resolve, reject) => {
+      babelClient.getEntireTargetFeed(target, token, hydrate, function(err, result){
+        if(err){
+          reject(err);
+        }else{
+          resolve(result);
+        }
+      });
+    });
+  }
+
+  function headTargetFeed(target, token, params){
+    return new Promise((resolve, reject) => {
+      babelClient.headTargetFeed(target, token, params, function(err, result){
         if(err){
           reject(err);
         }else{
