@@ -21,8 +21,6 @@
     "lodash": "4.17.21",
     "md5": "2.2.1",
     "node-cache": "4.2.0",
-    "request": "2.88.2",
-    "request-promise-native": "^1.0.8",
     "uuid": "2.0.2"
   },
   "devDependencies": {
