@@ -211,9 +211,10 @@ function Client() {
 
     debug('request options', requestOptions);
 
+    var body = '';
     const r = http.request(requestOptions, resp => {
       resp.on("data", d => {
-        process.stdout.write(d);
+        body += d;
       });
 
       r.on('error', (e) => {
@@ -230,7 +231,21 @@ function Client() {
       });
 
       resp.on("end", d => {
-        callback(null, {"code": codesAndLabels.SUCCESS, "label": codesAndLabels[codesAndLabels.SUCCESS], body: data});
+        if (parseInt(resp.statusCode / 100) !== 2) {
+          var errorCode = getCodeFromHttpStatusCode(null, resp.statusCode, body);
+
+          var errorResponse = {
+            code: errorCode,
+            label: codesAndLabels[errorCode],
+          };
+
+          error('[echoClient] addEvent error', errorResponse);
+          callback(errorResponse);
+          return;
+        } else {
+          callback(null, {"code": codesAndLabels.SUCCESS, "label": codesAndLabels[codesAndLabels.SUCCESS], body: data});
+          return;
+        }
       });
     });
 
@@ -283,47 +298,58 @@ function Client() {
     }
 
     var requestOptions = {
-      url: config.echo_endpoint + '/1/analytics/' + queryOperator + '?' + constructQueryStringResponse.queryString,
-      method: 'GET',
+      hostname: endpointUrl.hostname,
+      port: endpointUrl.port ? endpointUrl.port : (endpointUrl.protocol === 'https:' ? 443 : 80),
+      path:  '/1/analytics/' + queryOperator + '?' + constructQueryStringResponse.queryString,
+      method: "GET",
       headers: {
         'Content-Type': 'application/json',
         Authorization: 'Bearer ' + token,
         'User-Agent': userAgent,
-      }
+      },
     };
-
-    if (useCache === false) {
-      requestOptions.headers['cache-control'] = 'none';
-    }
 
     debug('request options', requestOptions);
 
-    request.get(requestOptions, function onResp(err, response, rawBody) {
-      var statusCode = response && response.statusCode ? response.statusCode : 0;
-      if (err || parseInt(statusCode / 100) !== 2) {
-        var errorCode = getCodeFromHttpStatusCode(err, statusCode, rawBody);
-  
+    var body = '';
+    const r = http.request(requestOptions, resp => {
+      resp.on("data", d => {
+        body += d;
+      });
+
+      r.on('error', (e) => {
+        error('[echoClient] addEvents error', e);
+        var errorCode = codesAndLabels.REQUEST_ERROR;
+
         var errorResponse = {
           code: errorCode,
           label: codesAndLabels[errorCode],
         };
 
-        error('[echoClient] queryAnalytics error', errorResponse);
+        error('[echoClient] addEvents error response', errorResponse);
         callback(errorResponse);
-        return;
-      } else {
-        delete rawBody.statusCode;
-        var body;
-        try {
-          body = JSON.parse(rawBody);
-        } catch (exception) {
-          error("Error parsing returned JSON", exception);
-          callback("Error parsing returned JSON");
+      });
+
+      resp.on("end", d => {
+        if (parseInt(resp.statusCode / 100) !== 2) {
+          var errorCode = getCodeFromHttpStatusCode(null, resp.statusCode, body);
+
+          var errorResponse = {
+            code: errorCode,
+            label: codesAndLabels[errorCode],
+          };
+
+          error('[echoClient] queryAnalytics error', errorResponse);
+          callback(errorResponse);
+          return;
+        } else {
+          callback(null, {"code": codesAndLabels.SUCCESS, "label": codesAndLabels[codesAndLabels.SUCCESS], body: JSON.parse(body)});
           return;
         }
-        callback(null, {"code": codesAndLabels.SUCCESS, "label": codesAndLabels[codesAndLabels.SUCCESS], "body": body});
-      }
+      });
     });
+
+    r.end();
   };
 
   return EchoClient;
