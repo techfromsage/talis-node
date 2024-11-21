@@ -1,6 +1,5 @@
 'use strict';
 
-var request = require('request');
 var _ = require('lodash');
 var codesAndLabels = require('./lib/codes-labels').codesAndLabels;
 var httpStatusToCode = require('./lib/codes-labels').httpStatusToCode;
@@ -67,6 +66,8 @@ function queryStringParams(params) {
 
 function Client() {
   var config = {};
+  var http;
+  var endpointUrl;
   var userAgent = (process && _.has(process, ["version", "env.NODE_ENV"])) ? "talis-node/" +
         clientVer + " (nodejs/" + process.version + "; NODE_ENV=" +
         process.env.NODE_ENV + ")" : "talis-node/" + clientVer;
@@ -158,6 +159,10 @@ function Client() {
         throw new Error('Missing Echo config: ' + key);
       }
     });
+
+    endpointUrl = new URL(config.echo_endpoint);
+    var schema = endpointUrl.protocol;
+    http = require(schema === 'https:' ? 'https' : 'http');
   }
 
   /**
@@ -192,36 +197,45 @@ function Client() {
     }
 
     var requestOptions = {
-      url: config.echo_endpoint + '/1/events',
+      hostname: endpointUrl.hostname,
+      port: endpointUrl.port ? endpointUrl.port : (endpointUrl.protocol === 'https:' ? 443 : 80),
+      path: '/1/events',
+      method: "POST",
       headers: {
+        'Content-Type': 'application/json',
         Accept: 'application/json',
         Authorization: 'Bearer ' + token,
         'User-Agent': userAgent,
       },
-      body: data,
-      method: 'POST',
-      json: true
     };
 
     debug('request options', requestOptions);
 
-    request.post(requestOptions, function onResp(err, response, body) {
-      var statusCode = response && response.statusCode ? response.statusCode : 0;
-      if (err || parseInt(statusCode / 100) !== 2) {
-        var errorCode = getCodeFromHttpStatusCode(err, statusCode, body);
+    const r = http.request(requestOptions, resp => {
+      resp.on("data", d => {
+        process.stdout.write(d);
+      });
+
+      r.on('error', (e) => {
+        error('[echoClient] addEvents error', e);
+        var errorCode = codesAndLabels.REQUEST_ERROR;
 
         var errorResponse = {
           code: errorCode,
           label: codesAndLabels[errorCode],
         };
 
-        error('[echoClient] addEvents error', errorResponse);
+        error('[echoClient] addEvents error response', errorResponse);
         callback(errorResponse);
-        return;
-      } else {
-        callback(null, {"code": codesAndLabels.SUCCESS, "label": codesAndLabels[codesAndLabels.SUCCESS], body: body});
-      }
+      });
+
+      resp.on("end", d => {
+        callback(null, {"code": codesAndLabels.SUCCESS, "label": codesAndLabels[codesAndLabels.SUCCESS], body: data});
+      });
     });
+
+    r.write(JSON.stringify(data));
+    r.end();
   };
 
   /**
