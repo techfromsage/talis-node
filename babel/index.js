@@ -1,8 +1,6 @@
 'use strict';
 
 var _ = require('lodash'),
-    request = require('request'),
-    rpn = require('request-promise-native'),
     md5 = require('md5'),
     querystring = require('querystring');
 
@@ -36,7 +34,10 @@ var BabelClient = function babelClient(config) {
         throw new Error('Invalid Babel config: babel_host');
     }
 
-    this.config.babel_hostname = this.config.babel_host.split('://', 2)[1];
+    this.config.endpointUrl = new URL(config.babel_host);
+
+    var schema = this.config.endpointUrl.protocol;
+    this.http = require(schema === 'https:' ? 'https' : 'http');
 
     this.userAgent = (process && _.has(process, ["version", "env.NODE_ENV"])) ? "talis-node/" +
         clientVer + " (nodejs/" + process.version + "; NODE_ENV=" +
@@ -305,24 +306,36 @@ BabelClient.prototype.getAnnotation = function getAnnotation(token, id, callback
     var self = this;
 
     var requestOptions = {
-        url: this._getBaseURL() + '/annotations/'+id,
-        headers: {
-            'Accept': 'application/json',
-            'Authorization':'Bearer '+token,
-            'Host': this.config.babel_hostname,
-            'User-Agent': this.userAgent,
-        }
+      hostname: this.config.endpointUrl.hostname,
+      port: this.config.endpointUrl.port ? this.config.endpointUrl.port : (this.config.endpointUrl.protocol === 'https:' ? 443 : 80),
+      path:  '/annotations/' + id,
+      method: "GET",
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token,
+        'User-Agent': this.userAgent,
+      },
     };
 
-    this.debug(JSON.stringify(requestOptions));
+    var self = this;
 
-    request(requestOptions, function requestResponse(err, response, body){
-        if(err){
-            callback(err);
-        } else{
-            self._parseJSON(response, body, callback);
-        }
+    var body = '';
+    const r = this.http.request(requestOptions, resp => {
+      resp.on("data", d => {
+        body += d;
+      });
+
+      r.on('error', (err) => {
+        callback(err);
+      });
+
+      resp.on("end", d => {
+        self._parseJSON(resp, body, callback);
+      });
     });
+
+    r.end();
 };
 
 /**
@@ -445,16 +458,17 @@ BabelClient.prototype.createAnnotation = function createAnnotation(token, data, 
     });
 
     var requestOptions = {
-        method:'POST',
-        body:data,
-        json:true,
-        url: this._getBaseURL() + '/annotations',
-        headers: {
-            'Accept': 'application/json',
-            'Authorization':'Bearer '+token,
-            'Host': this.config.babel_hostname,
-            'User-Agent': this.userAgent,
-        }
+      hostname: this.config.endpointUrl.hostname,
+      port: this.config.endpointUrl.port ? this.config.endpointUrl.port : (this.config.endpointUrl.protocol === 'https:' ? 443 : 80),
+      path: '/annotations',
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+        Authorization: 'Bearer ' + token,
+        'Host': this.config.endpointUrl.hostname,
+        'User-Agent': this.userAgent,
+      },
     };
 
     // if options.xIngestSynchronously set to true, then and only then add the header
@@ -463,19 +477,30 @@ BabelClient.prototype.createAnnotation = function createAnnotation(token, data, 
         requestOptions.headers['X-Ingest-Synchronously'] = 'true';
     }
 
-    this.debug(JSON.stringify(requestOptions));
+    var body = '';
+    const r = this.http.request(requestOptions, resp => {
+      resp.on("data", d => {
+        body += d;
+      });
 
-    request.post(requestOptions, function requestResponse(err, response, body){
-        if (err) {
-            callback(err);
-        } else if (!this._responseSuccessful(response)) {
+      resp.on('error', (e) => {
+        callback(e);
+      });
+
+      resp.on("end", d => {
+        if (parseInt(resp.statusCode / 100) !== 2) {
             var babelError = new Error('Error creating annotation: ' + JSON.stringify(body));
-            babelError.http_code = response && response.statusCode ? response.statusCode : 404;
+            babelError.http_code = resp && resp.statusCode ? resp.statusCode : 404;
             callback(babelError);
         } else {
-            callback(null, body);
+          callback(null, JSON.parse(body));
+          return;
         }
-    }.bind(this));
+      });
+    });
+
+    r.write(JSON.stringify(data));
+    r.end();
 };
 
 /**

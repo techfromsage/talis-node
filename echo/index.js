@@ -217,7 +217,7 @@ function Client() {
         body += d;
       });
 
-      r.on('error', (e) => {
+      resp.on('error', (e) => {
         error('[echoClient] addEvents error', e);
         var errorCode = codesAndLabels.REQUEST_ERROR;
 
@@ -317,7 +317,7 @@ function Client() {
         body += d;
       });
 
-      r.on('error', (e) => {
+      resp.on('error', (e) => {
         error('[echoClient] addEvents error', e);
         var errorCode = codesAndLabels.REQUEST_ERROR;
 

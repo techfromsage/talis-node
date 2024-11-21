@@ -4,7 +4,7 @@ var babel = require('../../index.js');
 var sinon = require('sinon');
 const fs = require('fs');
 
-describe("Babel Node Client Smoke Test Against Local Echo", function(){
+describe("Babel Node Client Smoke Test Against Local Babel", function(){
   // Create a token by running the following command in the project root:
   //   persona-token local > persona-token.txt
   var token = fs.readFileSync('persona-token.txt', 'utf8').trim();
