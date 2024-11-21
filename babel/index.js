@@ -573,31 +573,43 @@ BabelClient.prototype.updateAnnotation = function updateAnnotation(token, data, 
     });
 
     var requestOptions = {
-        method: 'PUT',
-        body: data,
-        json: true,
-        url: this._getBaseURL() + '/annotations/' + data._id,
-        headers: {
-            'Accept': 'application/json',
-            'Authorization': 'Bearer ' + token,
-            'Host': this.config.babel_hostname,
-            'User-Agent': this.userAgent,
-        }
+      hostname: this.config.endpointUrl.hostname,
+      port: this.config.endpointUrl.port ? this.config.endpointUrl.port : (this.config.endpointUrl.protocol === 'https:' ? 443 : 80),
+      path: '/annotations/' + data._id,
+      method: "PUT",
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+        Authorization: 'Bearer ' + token,
+        'Host': this.config.endpointUrl.hostname,
+        'User-Agent': this.userAgent,
+      },
     };
 
-    this.debug(JSON.stringify(requestOptions));
+    var body = '';
+    const r = this.http.request(requestOptions, resp => {
+      resp.on("data", d => {
+        body += d;
+      });
 
-    request.put(requestOptions, function requestResponse(err, response, body){
-        if (err) {
-            callback(err);
-        } else if (!this._responseSuccessful(response)) {
+      resp.on('error', (e) => {
+        callback(e);
+      });
+
+      resp.on("end", d => {
+        if (parseInt(resp.statusCode / 100) !== 2) {
             var babelError = new Error('Error updating annotation: ' + JSON.stringify(body));
-            babelError.http_code = response && response.statusCode ? response.statusCode : 404;
+            babelError.http_code = resp && resp.statusCode ? resp.statusCode : 404;
             callback(babelError);
         } else {
-            callback(null, body);
+          callback(null, JSON.parse(body));
+          return;
         }
-    }.bind(this));
+      });
+    });
+
+    r.write(JSON.stringify(data));
+    r.end();
 };
 
 /**
@@ -616,32 +628,41 @@ BabelClient.prototype.deleteAnnotation = function deleteAnnotation(token, annota
     }
 
     var requestOptions = {
-        method: 'DELETE',
-        json: true,
-        url: this._getBaseURL() + '/annotations/' + annotationId,
-        headers: {
-            'Accept': 'application/json',
-            'Authorization': 'Bearer ' + token,
-            'Host': this.config.babel_hostname,
-            'User-Agent': this.userAgent,
-        }
+      hostname: this.config.endpointUrl.hostname,
+      port: this.config.endpointUrl.port ? this.config.endpointUrl.port : (this.config.endpointUrl.protocol === 'https:' ? 443 : 80),
+      path: '/annotations/' + annotationId,
+      method: "DELETE",
+      headers: {
+        Accept: 'application/json',
+        Authorization: 'Bearer ' + token,
+        'Host': this.config.endpointUrl.hostname,
+        'User-Agent': this.userAgent,
+      },
     };
 
-    this.debug(JSON.stringify(requestOptions));
+    var body = '';
+    const r = this.http.request(requestOptions, resp => {
+      resp.on("data", d => {
+        body += d;
+      });
 
-    request.delete(requestOptions, function requestResponse(err, response, body){
-        if (err) {
-            callback(err);
+      resp.on('error', (e) => {
+        callback(e);
+      });
+
+      resp.on("end", d => {
+        if (resp.statusCode !== 204){
+            var babelError = new Error('Error deleting annotation: ' + JSON.stringify(body));
+            babelError.http_code = resp.statusCode;
+            callback(babelError);
         } else {
-            if (response.statusCode !== 204){
-                var babelError = new Error('Error deleting annotation: ' + JSON.stringify(body));
-                babelError.http_code = response.statusCode;
-                callback(babelError);
-            } else {
-                callback(null, null);
-            }
+          callback(null, null);
+          return;
         }
+      });
     });
+
+    r.end();
 };
 
 /**
