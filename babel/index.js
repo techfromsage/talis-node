@@ -137,21 +137,20 @@ BabelClient.prototype.getEntireTargetFeed = async function (target, token, hydra
             offset: currentPage * perPage,
         })
 
-        const requestOptions = {
-            json: true,
-            simple: false,
-            resolveWithFullResponse: true,
-            method: 'GET',
-            url:  this._getBaseURL()
-                + '/feeds/targets/'
+        var requestOptions = {
+            hostname: this.config.endpointUrl.hostname,
+            port: this.config.endpointUrl.port ? this.config.endpointUrl.port : (this.config.endpointUrl.protocol === 'https:' ? 443 : 80),
+            path: '/feeds/targets/'
                 + md5(target)
                 + '/activity/annotations'
                 + ((hydrate === true) ? '/hydrate' : '')
                 + (!_.isEmpty(queryString) ? '?'+queryString : ''),
+            method: "GET",
             headers: {
-                'Accept': 'application/json',
-                'Authorization':'Bearer '+ token,
-                'Host': this.config.babel_hostname,
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token,
+                'Host': this.config.endpointUrl.hostname,
                 'User-Agent': this.userAgent,
             },
         };
@@ -159,16 +158,15 @@ BabelClient.prototype.getEntireTargetFeed = async function (target, token, hydra
         this.debug(JSON.stringify(requestOptions));
 
         try {
+            const response = await this.requestAsync(requestOptions);
+
             const {
-                body: {
-                    feed_length,
-                    annotations,
-                    userProfiles,
-                    error,
-                    error_description,
-                },
-                ...response
-            } = await rpn(requestOptions);
+              feed_length,
+              annotations,
+              userProfiles,
+              error,
+              error_description,
+            } = response;
 
             if (error) {
                 callbackError = new Error(error_description);
@@ -199,6 +197,63 @@ BabelClient.prototype.getEntireTargetFeed = async function (target, token, hydra
 
     return callback(callbackError, results);
 }
+
+BabelClient.prototype.requestAsync = async function (requestOptions) {
+  return new Promise((resolve, reject) => {
+    var body = '';
+    const r = this.http.request(requestOptions, resp => {
+      resp.on("data", d => {
+        body += d;
+      });
+
+      resp.on('error', (e) => {
+        callback(e);
+      });
+
+      resp.on("end", d => {
+        if (parseInt(resp.statusCode / 100) !== 2) {
+          reject(resp);
+          return;
+        } else {
+          var jsonBody = JSON.parse(body);
+          if(jsonBody.error){
+          } else {
+              resolve(jsonBody);
+          }
+          return;
+        }
+      });
+    });
+
+    r.end();
+  });
+}
+
+async function getTargetFeedAsync(target, token, hydrate, callback) {
+    var body = '';
+    const r = this.http.request(requestOptions, resp => {
+      resp.on("data", d => {
+        body += d;
+      });
+
+      resp.on('error', (e) => {
+        callback(e);
+      });
+
+      resp.on("end", d => {
+        if (resp.statusCode !== 204){
+            var babelError = new Error();
+            babelError.http_code = resp.statusCode;
+            callback(babelError);
+        } else {
+          callback(null, resp);
+          return;
+        }
+      });
+    });
+
+    r.end();
+};
 
 /**
  * Get a feed based off a target identifier. Return either a list of feed identifiers, or hydrate it and
