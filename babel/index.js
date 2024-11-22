@@ -72,30 +72,41 @@ BabelClient.prototype.headTargetFeed = function headTargetFeed(target, token, pa
     var queryString = this._queryStringParams(params);
 
     var requestOptions = {
-        method: "HEAD",
-        url: this._getBaseURL() +
-            '/feeds/targets/'+md5(target)+'/activity/annotations' + (!_.isEmpty(queryString) ? '?'+queryString : ''),
-        headers: {
-            'Accept': 'application/json',
-            'Authorization':'Bearer '+token,
-            'Host': this.config.babel_hostname,
-            'User-Agent': this.userAgent,
-        }
+      hostname: this.config.endpointUrl.hostname,
+      port: this.config.endpointUrl.port ? this.config.endpointUrl.port : (this.config.endpointUrl.protocol === 'https:' ? 443 : 80),
+      path: '/feeds/targets/'+md5(target)+'/activity/annotations' + (!_.isEmpty(queryString) ? '?'+queryString : ''),
+      method: "HEAD",
+      headers: {
+        Accept: 'application/json',
+        Authorization: 'Bearer ' + token,
+        'Host': this.config.endpointUrl.hostname,
+        'User-Agent': this.userAgent,
+      },
     };
 
-    this.debug(JSON.stringify(requestOptions));
+    var body = '';
+    const r = this.http.request(requestOptions, resp => {
+      resp.on("data", d => {
+        body += d;
+      });
 
-    request(requestOptions, function requestResponse(err, response){
-        if(err){
-            callback(err);
-        } else if(response.statusCode && response.statusCode !== 204){
+      resp.on('error', (e) => {
+        callback(e);
+      });
+
+      resp.on("end", d => {
+        if (resp.statusCode !== 204){
             var babelError = new Error();
-            babelError.http_code = response.statusCode || 404;
+            babelError.http_code = resp.statusCode;
             callback(babelError);
-        } else{
-            callback(null, response);
+        } else {
+          callback(null, resp);
+          return;
         }
+      });
     });
+
+    r.end();
 };
 
 BabelClient.prototype.getEntireTargetFeed = async function (target, token, hydrate, callback) {
@@ -223,25 +234,34 @@ BabelClient.prototype.getTargetFeed = function getTargetFeed(target, token, hydr
     var queryString = this._queryStringParams(params);
 
     var requestOptions = {
-        url: this._getBaseURL() +
-          '/feeds/targets/'+md5(target)+'/activity/annotations'+((hydrate === true) ? '/hydrate' : '') + (!_.isEmpty(queryString) ? '?'+queryString : ''),
-        headers: {
-            'Accept': 'application/json',
-            'Authorization':'Bearer '+token,
-            'Host': this.config.babel_hostname,
-            'User-Agent': this.userAgent,
-        }
+      hostname: this.config.endpointUrl.hostname,
+      port: this.config.endpointUrl.port ? this.config.endpointUrl.port : (this.config.endpointUrl.protocol === 'https:' ? 443 : 80),
+      path: '/feeds/targets/'+md5(target)+'/activity/annotations'+((hydrate === true) ? '/hydrate' : '') + (!_.isEmpty(queryString) ? '?'+queryString : ''),
+      method: "GET",
+      headers: {
+        Accept: 'application/json',
+        Authorization: 'Bearer ' + token,
+        'Host': this.config.endpointUrl.hostname,
+        'User-Agent': this.userAgent,
+      },
     };
 
-    this.debug(JSON.stringify(requestOptions));
+    var body = '';
+    const r = this.http.request(requestOptions, resp => {
+      resp.on("data", d => {
+        body += d;
+      });
 
-    request(requestOptions, function requestResponse(err, response, body){
-        if(err){
-            callback(err);
-        } else{
-            self._parseJSON(response, body, callback);
-        }
+      resp.on('error', (e) => {
+        callback(e);
+      });
+
+      resp.on("end", d => {
+        self._parseJSON(resp, body, callback);
+      });
     });
+
+    r.end();
 };
 
 /***
@@ -267,24 +287,34 @@ BabelClient.prototype.getFeeds = function getFeeds(feeds, token, callback) {
     feeds = feeds.join(",");
 
     var requestOptions = {
-        url: this._getBaseURL() + '/feeds/annotations/hydrate?feed_ids=' + encodeURIComponent(feeds),
-        headers: {
-            'Accept': 'application/json',
-            'Authorization': 'Bearer ' + token,
-            'Host': this.config.babel_hostname,
-            'User-Agent': this.userAgent,
-        }
+      hostname: this.config.endpointUrl.hostname,
+      port: this.config.endpointUrl.port ? this.config.endpointUrl.port : (this.config.endpointUrl.protocol === 'https:' ? 443 : 80),
+      path: '/feeds/annotations/hydrate?feed_ids=' + encodeURIComponent(feeds),
+      method: "GET",
+      headers: {
+        Accept: 'application/json',
+        Authorization: 'Bearer ' + token,
+        'Host': this.config.endpointUrl.hostname,
+        'User-Agent': this.userAgent,
+      },
     };
 
-    this.debug(JSON.stringify(requestOptions));
+    var body = '';
+    const r = this.http.request(requestOptions, resp => {
+      resp.on("data", d => {
+        body += d;
+      });
 
-    request(requestOptions, function requestResponse(err, response, body) {
-        if (err) {
-            callback(err);
-        } else {
-            self._parseJSON(response, body, callback);
-        }
+      resp.on('error', (e) => {
+        callback(e);
+      });
+
+      resp.on("end", d => {
+        self._parseJSON(resp, body, callback);
+      });
     });
+
+    r.end();
 };
 
 /**

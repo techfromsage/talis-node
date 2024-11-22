@@ -30,14 +30,13 @@ describe("Babel Node Client Smoke Test Against Local Babel", function(){
   it("should head taget feed", async function(){
     var target = "http://target/1234567890";
     var getFeedResult = await getTargetFeed(target, token, true, {limit: 1});
-    console.log('result:', result);
     var params = {
       delta_token: getFeedResult.delta_token,
     };
 
-    var result = await headTargetFeed(target, token, params);
+    var response = await headTargetFeed(target, token, params);
 
-    result.should.have.property('body');
+    response.headers.should.have.property('x-feed-new-items');
   });
 
   it("should get entire target feed", async function(){
