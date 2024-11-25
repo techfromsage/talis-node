@@ -343,8 +343,13 @@ function Client() {
           callback(errorResponse);
           return;
         } else {
-          callback(null, {"code": codesAndLabels.SUCCESS, "label": codesAndLabels[codesAndLabels.SUCCESS], body: JSON.parse(body)});
-          return;
+          try {
+            callback(null, {"code": codesAndLabels.SUCCESS, "label": codesAndLabels[codesAndLabels.SUCCESS], body: JSON.parse(body)});
+            return;
+          } catch (e) {
+            callback('Error parsing returned JSON');
+            return;
+          }
         }
       });
     });
