@@ -34,7 +34,8 @@ var BabelClient = function babelClient(config) {
         throw new Error('Invalid Babel config: babel_host');
     }
 
-    this.config.endpointUrl = new URL(config.babel_host);
+    var port = config.babel_port ? config.babel_port : (config.babel_host === 'https:' ? 443 : 80);
+    this.config.endpointUrl = new URL(`${config.babel_host}:${port}`);
 
     var schema = this.config.endpointUrl.protocol;
     this.http = require(schema === 'https:' ? 'https' : 'http');
@@ -188,7 +189,7 @@ BabelClient.prototype.getEntireTargetFeed = async function (target, token, hydra
             }
 
         } catch (error) {
-            this.error(`Error fetching babel feed ${JSON.stringify(error)}`);
+            this.error(`Error fetching babel feed ${error}`);
             callbackError = error;
         }
 
@@ -212,11 +213,15 @@ BabelClient.prototype.requestAsync = async function (requestOptions) {
 
       resp.on("end", d => {
         if (parseInt(resp.statusCode / 100) !== 2) {
-          reject(resp);
+          reject({http_code: resp.statusCode, message: JSON.parse(body).error_description});
           return;
         } else {
           var jsonBody = JSON.parse(body);
           if(jsonBody.error){
+              var statusCode = jsonBody.statusCode ? jsonBody.statusCode : 400;
+              var message = jsonBody.error_description ? jsonBody.error_description : 'UNKNOWN';
+              reject({http_code: statusCode, message: message});
+              return;
           } else {
               resolve(jsonBody);
           }
