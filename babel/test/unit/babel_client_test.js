@@ -81,7 +81,7 @@ describe("Babel Node Client Test Suite", function(){
                 babel_port:3000
             });
             // var requestStub = function(options, callback){
-            //     options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
+            //     options.headers.should.have.property('User-Agent', 'talis-node/0.2.3');
             //     callback(new Error('Error communicating with Babel'));
             // };
 
@@ -91,7 +91,7 @@ describe("Babel Node Client Test Suite", function(){
             nock(endPoint)
                 .head('/feeds/targets/'+md5('TARGET')+'/activity/annotations')
                 .reply(function(uri, requestBody){
-                    this.req.headers['user-agent'].should.equal('talis-node/0.2.1');
+                    this.req.headers['user-agent'].should.equal('talis-node/0.2.3');
                     return [400];
                 });
 
@@ -112,7 +112,7 @@ describe("Babel Node Client Test Suite", function(){
             nock(endPoint)
                 .head('/feeds/targets/'+md5('TARGET')+'/activity/annotations')
                 .reply(function(uri, requestBody){
-                    this.req.headers['user-agent'].should.equal('talis-node/0.2.1');
+                    this.req.headers['user-agent'].should.equal('talis-node/0.2.3');
                     return [401, {}];
                 });
 
@@ -133,7 +133,7 @@ describe("Babel Node Client Test Suite", function(){
             nock(endPoint)
                 .head('/feeds/targets/'+md5('TARGET')+'/activity/annotations')
                 .reply(function(uri, requestBody){
-                    this.req.headers['user-agent'].should.equal('talis-node/0.2.1');
+                    this.req.headers['user-agent'].should.equal('talis-node/0.2.3');
                     return [404];
                 });
 
@@ -153,7 +153,7 @@ describe("Babel Node Client Test Suite", function(){
             nock(endPoint)
                 .head('/feeds/targets/'+md5('TARGET')+'/activity/annotations')
                 .reply(function(uri, requestBody){
-                    this.req.headers['user-agent'].should.equal('talis-node/0.2.1');
+                    this.req.headers['user-agent'].should.equal('talis-node/0.2.3');
                     return [204, {}, {'x-feed-new-items': '1'}];
                 });
 
@@ -176,7 +176,7 @@ describe("Babel Node Client Test Suite", function(){
             nock(endPoint)
                 .head('/feeds/targets/'+md5('TARGET')+'/activity/annotations')
                 .reply(function(uri, requestBody){
-                    this.req.headers['user-agent'].should.equal('talis-node/0.2.1');
+                    this.req.headers['user-agent'].should.equal('talis-node/0.2.3');
                     return [204, {}, {'x-feed-new-items': '2'}];
                 });
 
@@ -229,7 +229,7 @@ describe("Babel Node Client Test Suite", function(){
             nock(endPoint)
                 .get('/feeds/targets/'+md5('TARGET')+'/activity/annotations')
                 .reply(function(uri, requestBody){
-                    this.req.headers['user-agent'].should.equal('talis-node/0.2.1');
+                    this.req.headers['user-agent'].should.equal('talis-node/0.2.3');
                     return [404];
                 });
 
@@ -251,7 +251,7 @@ describe("Babel Node Client Test Suite", function(){
             nock(endPoint)
                 .get('/feeds/targets/'+md5('TARGET')+'/activity/annotations/hydrate?limit=1000&offset=0')
                 .reply(function(uri, requestBody){
-                    this.req.headers['user-agent'].should.equal('talis-node/0.2.1');
+                    this.req.headers['user-agent'].should.equal('talis-node/0.2.3');
                     return [401, {
                         error:"invalid_token",
                         error_description:"The token is invalid or has expired"
@@ -276,7 +276,7 @@ describe("Babel Node Client Test Suite", function(){
             nock(endPoint)
                 .get('/feeds/targets/'+md5('TARGET')+'/activity/annotations/hydrate?limit=1000&offset=0')
                 .reply(function(uri, requestBody){
-                    this.req.headers['user-agent'].should.equal('talis-node/0.2.1');
+                    this.req.headers['user-agent'].should.equal('talis-node/0.2.3');
                     return [404, {
                         error:"feed_not_found",
                         error_description:"Feed not found"
@@ -322,7 +322,7 @@ describe("Babel Node Client Test Suite", function(){
             nock(endPoint)
                 .get('/feeds/targets/'+md5('TARGET')+'/activity/annotations/hydrate?limit=1000&offset=0')
                 .reply(function(uri, requestBody){
-                    this.req.headers['user-agent'].should.equal('talis-node/0.2.1');
+                    this.req.headers['user-agent'].should.equal('talis-node/0.2.3');
                     return [200, {
                         count:1000,
                         limit:1000,
@@ -342,7 +342,7 @@ describe("Babel Node Client Test Suite", function(){
             nock(endPoint)
                 .get('/feeds/targets/'+md5('TARGET')+'/activity/annotations/hydrate?limit=1000&offset=1000')
                 .reply(function(uri, requestBody){
-                    this.req.headers['user-agent'].should.equal('talis-node/0.2.1');
+                    this.req.headers['user-agent'].should.equal('talis-node/0.2.3');
                     return [200, {
                         count:1000,
                         limit:1000,
@@ -406,7 +406,7 @@ describe("Babel Node Client Test Suite", function(){
             nock(endPoint)
                 .get('/feeds/targets/'+md5('TARGET')+'/activity/annotations')
                 .reply(function(uri, requestBody){
-                    this.req.headers['user-agent'].should.equal('talis-node/0.2.1');
+                    this.req.headers['user-agent'].should.equal('talis-node/0.2.3');
                     return [200, {}];
                 });
 
@@ -426,7 +426,7 @@ describe("Babel Node Client Test Suite", function(){
                 babel_port:3000
             });
             var requestStub = function(options, callback){
-                options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
+                options.headers.should.have.property('User-Agent', 'talis-node/0.2.3');
                 callback(new Error('Error communicating with Babel'));
             };
 
@@ -452,7 +452,7 @@ describe("Babel Node Client Test Suite", function(){
             nock(endPoint)
                 .get('/feeds/targets/'+md5('TARGET')+'/activity/annotations')
                 .reply(function(uri, requestBody){
-                    this.req.headers['user-agent'].should.equal('talis-node/0.2.1');
+                    this.req.headers['user-agent'].should.equal('talis-node/0.2.3');
                     return [401, {
                         error:"invalid_token",
                         error_description:"The token is invalid or has expired"
@@ -481,7 +481,7 @@ describe("Babel Node Client Test Suite", function(){
             nock(endPoint)
                 .get('/feeds/targets/'+md5('TARGET')+'/activity/annotations')
                 .reply(function(uri, requestBody){
-                    this.req.headers['user-agent'].should.equal('talis-node/0.2.1');
+                    this.req.headers['user-agent'].should.equal('talis-node/0.2.3');
                     return [404, {
                         error:"feed_not_found",
                         error_description:"Feed not found"
@@ -509,7 +509,7 @@ describe("Babel Node Client Test Suite", function(){
             nock(endPoint)
                 .get('/feeds/targets/'+md5('TARGET')+'/activity/annotations')
                 .reply(function(uri, requestBody){
-                    this.req.headers['user-agent'].should.equal('talis-node/0.2.1');
+                    this.req.headers['user-agent'].should.equal('talis-node/0.2.3');
                     return [200, {
                         "count":2,
                         "limit":25,
@@ -555,7 +555,7 @@ describe("Babel Node Client Test Suite", function(){
             nock(endPoint)
                 .get('/feeds/targets/'+md5('TARGET')+'/activity/annotations')
                 .reply(function(uri, requestBody){
-                    this.req.headers['user-agent'].should.equal('talis-node/0.2.1');
+                    this.req.headers['user-agent'].should.equal('talis-node/0.2.3');
                     return [200, null];
                 });
 
@@ -617,7 +617,7 @@ describe("Babel Node Client Test Suite", function(){
                 babel_port:3000
             });
             // var requestStub = function(options, callback){
-            //     options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
+            //     options.headers.should.have.property('User-Agent', 'talis-node/0.2.3');
             //     callback(new Error('Error communicating with Babel'));
             // };
 
@@ -625,7 +625,7 @@ describe("Babel Node Client Test Suite", function(){
             nock(endPoint)
                 .get('/feeds/annotations/hydrate')
                 .reply(function(uri, requestBody){
-                    this.req.headers['user-agent'].should.equal('talis-node/0.2.1');
+                    this.req.headers['user-agent'].should.equal('talis-node/0.2.3');
                     return [401, {
                         error:"invalid_token",
                         error_description:"The token is invalid or has expired"
@@ -651,7 +651,7 @@ describe("Babel Node Client Test Suite", function(){
             nock(endPoint)
                 .get('/feeds/annotations/hydrate?feed_ids=FEED1')
                 .reply(function(uri, requestBody){
-                    this.req.headers['user-agent'].should.equal('talis-node/0.2.1');
+                    this.req.headers['user-agent'].should.equal('talis-node/0.2.3');
                     return [401, {
                         error:"invalid_token",
                         error_description:"The token is invalid or has expired"
@@ -679,7 +679,7 @@ describe("Babel Node Client Test Suite", function(){
             nock(endPoint)
                 .get('/feeds/annotations/hydrate?feed_ids=FEED1')
                 .reply(function(uri, requestBody){
-                    this.req.headers['user-agent'].should.equal('talis-node/0.2.1');
+                    this.req.headers['user-agent'].should.equal('talis-node/0.2.3');
                     return [404, {
                         error:"feed_not_found",
                         error_description:"Feed not found"
@@ -706,7 +706,7 @@ describe("Babel Node Client Test Suite", function(){
             nock(endPoint)
                 .get('/feeds/annotations/hydrate?feed_ids=FEED1%2CFEED2')
                 .reply(function(uri, requestBody){
-                    this.req.headers['user-agent'].should.equal('talis-node/0.2.1');
+                    this.req.headers['user-agent'].should.equal('talis-node/0.2.3');
                     return [200, {
                         "feed_length":2,
                         "limit":25,
@@ -758,7 +758,7 @@ describe("Babel Node Client Test Suite", function(){
             nock(endPoint)
                 .get('/feeds/annotations/hydrate?feed_ids=FEED1%2CFEED2')
                 .reply(function(uri, requestBody){
-                    this.req.headers['user-agent'].should.equal('talis-node/0.2.1');
+                    this.req.headers['user-agent'].should.equal('talis-node/0.2.3');
                     return [200, null];
                 });
 
@@ -808,7 +808,7 @@ describe("Babel Node Client Test Suite", function(){
             nock(endPoint)
                 .get('/annotations/id')
                 .reply(function(uri, requestBody){
-                    this.req.headers['user-agent'].should.equal('talis-node/0.2.1');
+                    this.req.headers['user-agent'].should.equal('talis-node/0.2.3');
                     return [401, {
                         error:"invalid_token",
                         error_description:"The token is invalid or has expired"
@@ -833,7 +833,7 @@ describe("Babel Node Client Test Suite", function(){
                 babel_port:3000
             });
             // var requestStub = function(options, callback){
-            //     options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
+            //     options.headers.should.have.property('User-Agent', 'talis-node/0.2.3');
             //     callback(new Error("Error communicating with Babel"));
             // };
 
@@ -842,7 +842,7 @@ describe("Babel Node Client Test Suite", function(){
             nock(endPoint)
                 .get('/annotations/id')
                 .reply(function(uri, requestBody){
-                    this.req.headers['user-agent'].should.equal('talis-node/0.2.1');
+                    this.req.headers['user-agent'].should.equal('talis-node/0.2.3');
                     return [404, {
                         error:"feed_not_found",
                         error_description:"Feed not found"
@@ -867,7 +867,7 @@ describe("Babel Node Client Test Suite", function(){
             nock(endPoint)
                 .get('/annotations/5628b931a394fb449e000247')
                 .reply(function(uri, requestBody){
-                    this.req.headers['user-agent'].should.equal('talis-node/0.2.1');
+                    this.req.headers['user-agent'].should.equal('talis-node/0.2.3');
                     return [200, {
                         // "__v": 0, What is this!
                         "annotatedBy": "bp",
@@ -905,7 +905,7 @@ describe("Babel Node Client Test Suite", function(){
             nock(endPoint)
                 .get('/annotations/id')
                 .reply(function(uri, requestBody){
-                    this.req.headers['user-agent'].should.equal('talis-node/0.2.1');
+                    this.req.headers['user-agent'].should.equal('talis-node/0.2.3');
                     return [200, null];
                 });
 
@@ -941,7 +941,7 @@ describe("Babel Node Client Test Suite", function(){
             nock(endPoint)
                 .get('/annotations?' + querystring.stringify({}))
                 .reply(function(uri, requestBody){
-                    this.req.headers['user-agent'].should.equal('talis-node/0.2.1');
+                    this.req.headers['user-agent'].should.equal('talis-node/0.2.3');
                     return [200, {}];
                 });
 
@@ -962,7 +962,7 @@ describe("Babel Node Client Test Suite", function(){
             nock(endPoint)
                 .get('/annotations?' + querystring.stringify({}))
                 .reply(function(uri, requestBody){
-                    this.req.headers['user-agent'].should.equal('talis-node/0.2.1');
+                    this.req.headers['user-agent'].should.equal('talis-node/0.2.3');
                     return [401, {
                         error:"invalid_token",
                         error_description:"The token is invalid or has expired"
@@ -986,7 +986,7 @@ describe("Babel Node Client Test Suite", function(){
                 babel_port:3000
             });
             // var requestStub = function(options, callback){
-            //     options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
+            //     options.headers.should.have.property('User-Agent', 'talis-node/0.2.3');
             //     callback(new Error('Error communicating with Babel'));
             // };
 
@@ -994,7 +994,7 @@ describe("Babel Node Client Test Suite", function(){
             nock(endPoint)
                 .get('/annotations?' + querystring.stringify({}))
                 .reply(function(uri, requestBody){
-                    this.req.headers['user-agent'].should.equal('talis-node/0.2.1');
+                    this.req.headers['user-agent'].should.equal('talis-node/0.2.3');
                     return [401, {
                         error:"invalid_token",
                         error_description:"The token is invalid or has expired"
@@ -1019,7 +1019,7 @@ describe("Babel Node Client Test Suite", function(){
             nock(endPoint)
                 .get('/annotations?' + querystring.stringify({}))
                 .reply(function(uri, requestBody){
-                    this.req.headers['user-agent'].should.equal('talis-node/0.2.1');
+                    this.req.headers['user-agent'].should.equal('talis-node/0.2.3');
                     return [200, {
                         "count":2,
                         "limit":25,
@@ -1066,7 +1066,7 @@ describe("Babel Node Client Test Suite", function(){
             nock(endPoint)
                 .get('/annotations?' + querystring.stringify({}))
                 .reply(function(uri, requestBody){
-                    this.req.headers['user-agent'].should.equal('talis-node/0.2.1');
+                    this.req.headers['user-agent'].should.equal('talis-node/0.2.3');
                     return [200, null];
                 });
 
@@ -1211,7 +1211,7 @@ describe("Babel Node Client Test Suite", function(){
             nock(endPoint)
                 .post('/annotations')
                 .reply(function(uri, requestBody){
-                    this.req.headers['user-agent'].should.equal('talis-node/0.2.1');
+                    this.req.headers['user-agent'].should.equal('talis-node/0.2.3');
                     return [401, {
                         error:"invalid_token",
                         error_description:"The token is invalid or has expired"
@@ -1245,7 +1245,7 @@ describe("Babel Node Client Test Suite", function(){
             });
             // var requestStub = {
             //     post:function(options, callback){
-            //         options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
+            //         options.headers.should.have.property('User-Agent', 'talis-node/0.2.3');
             //         var error = new Error('Error communicating with Babel');
             //         callback(error);
             //     }
@@ -1270,7 +1270,7 @@ describe("Babel Node Client Test Suite", function(){
             nock(endPoint)
                 .post('/annotations')
                 .reply(function(uri, requestBody){
-                    this.req.headers['user-agent'].should.equal('talis-node/0.2.1');
+                    this.req.headers['user-agent'].should.equal('talis-node/0.2.3');
                     return [400, {
                         body:"",
                         message:"Bad Request"
@@ -1298,7 +1298,7 @@ describe("Babel Node Client Test Suite", function(){
           nock(endPoint)
               .post('/annotations')
               .reply(function(uri, requestBody){
-                  this.req.headers['user-agent'].should.equal('talis-node/0.2.1');
+                  this.req.headers['user-agent'].should.equal('talis-node/0.2.3');
                   return [502, {
                       message:"Bad Gateway"
                   }];
@@ -1335,7 +1335,7 @@ describe("Babel Node Client Test Suite", function(){
             nock(endPoint)
               .post('/annotations')
               .reply(function(uri, requestBody){
-                  this.req.headers['user-agent'].should.equal('talis-node/0.2.1');
+                  this.req.headers['user-agent'].should.equal('talis-node/0.2.3');
                   return [201, {
                     // __v: 0, // What is this!
                     annotatedBy: 'Gordon Freeman',
@@ -1380,7 +1380,7 @@ describe("Babel Node Client Test Suite", function(){
             nock(endPoint)
                 .post('/annotations')
                 .reply(function(uri, requestBody){
-                    this.req.headers['user-agent'].should.equal('talis-node/0.2.1');
+                    this.req.headers['user-agent'].should.equal('talis-node/0.2.3');
                     return [201, {
                         // __v: 0,
                         annotatedBy: 'Gordon Freeman',
@@ -1614,7 +1614,7 @@ describe("Babel Node Client Test Suite", function(){
             nock(endPoint)
                 .put('/annotations/testid')
                 .reply(function(uri, requestBody){
-                    this.req.headers['user-agent'].should.equal('talis-node/0.2.1');
+                    this.req.headers['user-agent'].should.equal('talis-node/0.2.3');
                     return [401, {
                         error:"invalid_token",
                         error_description:"The token is invalid or has expired"
@@ -1647,7 +1647,7 @@ describe("Babel Node Client Test Suite", function(){
             });
             // var requestStub = {
             //     put:function(options, callback){
-            //         options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
+            //         options.headers.should.have.property('User-Agent', 'talis-node/0.2.3');
             //         var error = new Error('Error communicating with Babel');
             //         callback(error);
             //     }
@@ -1657,7 +1657,7 @@ describe("Babel Node Client Test Suite", function(){
             nock(endPoint)
                 .post('/annotations')
                 .reply(function(uri, requestBody){
-                    this.req.headers['user-agent'].should.equal('talis-node/0.2.1');
+                    this.req.headers['user-agent'].should.equal('talis-node/0.2.3');
                     return [400, {
                         body:"",
                         message:"Bad Request"
@@ -1683,7 +1683,7 @@ describe("Babel Node Client Test Suite", function(){
             nock(endPoint)
                 .put('/annotations/testid')
                 .reply(function(uri, requestBody){
-                    this.req.headers['user-agent'].should.equal('talis-node/0.2.1');
+                    this.req.headers['user-agent'].should.equal('talis-node/0.2.3');
                     return [400, {
                         body:"",
                         message:"Bad Request"
@@ -1711,7 +1711,7 @@ describe("Babel Node Client Test Suite", function(){
           nock(endPoint)
               .put('/annotations/testid')
               .reply(function(uri, requestBody){
-                  this.req.headers['user-agent'].should.equal('talis-node/0.2.1');
+                  this.req.headers['user-agent'].should.equal('talis-node/0.2.3');
                   return [504, {
                       message:"Bad Gateway"
                   }];
@@ -1747,7 +1747,7 @@ describe("Babel Node Client Test Suite", function(){
             nock(endPoint)
                 .put('/annotations/testid')
                 .reply(function(uri, requestBody){
-                    this.req.headers['user-agent'].should.equal('talis-node/0.2.1');
+                    this.req.headers['user-agent'].should.equal('talis-node/0.2.3');
                     return [200, {
                         // __v: 0, What is this?
                         annotatedBy: 'Gordon Freeman',
@@ -1815,7 +1815,7 @@ describe("Babel Node Client Test Suite", function(){
             });
             // var requestStub = {
             //     delete:function(options, callback){
-            //         options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
+            //         options.headers.should.have.property('User-Agent', 'talis-node/0.2.3');
             //         var error = new Error('Error communicating with Babel');
             //         callback(error);
             //     }
@@ -1825,7 +1825,7 @@ describe("Babel Node Client Test Suite", function(){
             nock(endPoint)
                 .delete('/annotations/testid')
                 .reply(function(uri, requestBody){
-                    this.req.headers['user-agent'].should.equal('talis-node/0.2.1');
+                    this.req.headers['user-agent'].should.equal('talis-node/0.2.3');
                     return [400, {
                         body:"",
                         message:"Bad Request"
@@ -1857,7 +1857,7 @@ describe("Babel Node Client Test Suite", function(){
             nock(endPoint)
                 .delete('/annotations/testid')
                 .reply(function(uri, requestBody){
-                    this.req.headers['user-agent'].should.equal('talis-node/0.2.1');
+                    this.req.headers['user-agent'].should.equal('talis-node/0.2.3');
                     return [500, babelErr];
                 });
 
