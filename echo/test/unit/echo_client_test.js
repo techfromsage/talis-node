@@ -102,142 +102,11 @@ describe("Echo Node Client Test Suite", function(){
                 done();
             });
         });
-        // TODO - Can we remove this test? HOW CAN THERE BE NO BODY. IT IS A POST REQUEST
-        it.skip("- add events should return an error if call to request has missing option.body", function(done){
-            var echoClient = echo.createClient({
-                echo_endpoint: endPoint
-            });
-
-            nock(endPoint)
-                .post('/1/events')
-                .reply(function(uri, requestBody){
-                    this.req.headers['user-agent'].should.equal('talis-node/0.2.3');
-console.log(`body`, this.req.options.body);
-console.log(`requestBody`, requestBody);
-                    if(!this.req.options.body){
-                      return [400, {}];
-                    }
-                    // The test is checking for an error. Returning 200 will cause the test to fail
-                    // We are checking  for a missing body
-                    return [200, {}];
-                });
-
-            echoClient.addEvents('secret', {class:'class', source:'source'}, function(err){
-                (err === null).should.be.false;
-                err.code.should.equal(2);
-                done();
-            });
-        });
-        // TODO - Can we remove this test? HOW CAN THERE BE NO METHOD
-        it.skip("- add events should return an error if call to request has missing option.method", function(done){
-            var echoClient = echo.createClient({
-                echo_endpoint: endPoint
-            });
-
-            // var requestStub = sandbox.stub(request, 'post')
-            // requestStub.callsFake(function (options, callback) {
-            //     options.headers.should.have.property('User-Agent', 'talis-node/0.2.3');
-            //     if(!options.method){
-            //         var error = new Error('Missing field: options.method');
-            //         callback(error);
-            //     } else{
-            //         callback(null);
-            //     }
-            // });
-
-            nock(endPoint)
-                .post('/1/events')
-                .reply(function(uri, requestBody){
-                    this.req.headers['user-agent'].should.equal('talis-node/0.2.3');
-                    if(!this.req.options.method){
-                      return [400, {}];
-                    }
-                    // The test is checking for an error. Returning 200 will cause the test to fail
-                    // We are checking  for a missing body
-                    return [200, {}];
-                });
-
-
-            echoClient.addEvents('secret', {class:'class', source:'source'}, function(err){
-                (err === null).should.be.false;
-                done();
-            });
-        });
-        // TODO - Can we remove this test? If it wasn't a POST request, it would not be intersepted
-        // by nock - so isn't this just the happy case?
-        it.skip("- add events should return an error if call to request has option.method != POST", function(done){
-            var echoClient = echo.createClient({
-                echo_endpoint: endPoint
-            });
-
-            // var requestStub = sandbox.stub(request, 'post')
-            // requestStub.callsFake(function (options, callback) {
-            //     options.headers.should.have.property('User-Agent', 'talis-node/0.2.3');
-            //     if(options.method !== 'POST'){
-            //         var error = new Error('Invalid field: options.method');
-            //         callback(error);
-            //     } else{
-            //         callback(null);
-            //     }
-            // });
-            nock(endPoint)
-                .post('/1/events')
-                .reply(function(uri, requestBody){
-                    this.req.headers['user-agent'].should.equal('talis-node/0.2.3');
-                    if(this.req.options.method !== 'POST'){
-                      return [400, {}];
-                    }
-                    // The test is checking for an error. Returning 200 will cause the test to fail
-                    // We are checking  for a missing body
-                    return [200, {}];
-                });
-
-            echoClient.addEvents('secret', {class:'class', source:'source'}, function(err, result){
-                (err === null).should.be.false;
-                result.code.should.equal(0);
-                done();
-            });
-        });
-        // TODO - Can we remove this test? What is it really doing?
-        it.skip("- add events should return an error if call to request has missing option.json", function(done){
-            var echoClient = echo.createClient({
-                echo_endpoint: endPoint
-            });
-
-            var requestStub = sandbox.stub(request, 'post')
-            requestStub.callsFake(function (options, callback) {
-                options.headers.should.have.property('User-Agent', 'talis-node/0.2.3');
-                if(!options.json){
-                    var error = new Error('Missing field: options.json');
-                    callback(error);
-                } else{
-                    callback(null);
-                }
-            });
-
-            echoClient.addEvents('secret', {class:'class', source:'source'}, function(err){
-                (err === null).should.be.false;
-                done();
-            });
-        });
         it(" - should throw an error if persona validation fails", function(done) {
             var echoClient = echo.createClient({
                 echo_endpoint: endPoint
             });
 
-            // TODO Remove - but left until 8/6 code is reolved
-            //
-            // var requestStub = sandbox.stub(request, 'post')
-            // requestStub.callsFake(function (options, callback) {
-            //     options.headers.should.have.property('User-Agent', 'talis-node/0.2.3');
-            //     callback(
-            //       null,
-            //       {statusCode: 401},
-            //       {
-            //           "error": "invalid_token"
-            //       }
-            //   );
-            // });
             nock(endPoint)
                 .post('/1/events')
                 .reply(function(uri, requestBody){
@@ -248,9 +117,6 @@ console.log(`requestBody`, requestBody);
             echoClient.addEvents("incorrect_token", {class:'class', source:'source'}, function(err, result) {
                 (err === null).should.be.false;
 
-                // TODO What is the difference between code 8 and 6?
-                // err.code.should.equal(8);
-                // err.label.should.equal("INVALID_TOKEN");
                 err.code.should.equal(6);
                 err.label.should.equal("UNAUTHORISED");
                 done();
@@ -423,9 +289,6 @@ console.log(`requestBody`, requestBody);
 
             echoClient.queryAnalytics('secret', 'sum', params, false, function(err, result){
                 (err === null).should.be.false;
-                // TODO Why the change?
-                // err.code.should.equal(1);
-                // err.label.should.equal('REQUEST_ERROR');
                 err.code.should.equal(2);
                 err.label.should.equal('INVALID_QUERY');
                 (typeof result).should.equal('undefined');
@@ -451,9 +314,6 @@ console.log(`requestBody`, requestBody);
             echoClient.queryAnalytics("incorrect_token", "sum", params, false, function(err, result) {
                 (err === null).should.be.false;
 
-                // TODO What is the difference between code 8 and 6?
-                // err.code.should.equal(8);
-                // err.label.should.equal("INVALID_TOKEN");
                 err.code.should.equal(6);
                 err.label.should.equal("UNAUTHORISED");
                 done();
