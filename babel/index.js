@@ -37,8 +37,8 @@ var BabelClient = function babelClient(config) {
     var port = config.babel_port ? config.babel_port : (config.babel_host === 'https:' ? 443 : 80);
     this.config.endpointUrl = new URL(`${config.babel_host}:${port}`);
 
-    var schema = this.config.endpointUrl.protocol;
-    this.http = require(schema === 'https:' ? 'https' : 'http');
+    var scheme = this.config.endpointUrl.protocol;
+    this.http = require(scheme === 'https:' ? 'https' : 'http');
 
     this.userAgent = (process && _.has(process, ["version", "env.NODE_ENV"])) ? "talis-node/" +
         clientVer + " (nodejs/" + process.version + "; NODE_ENV=" +
