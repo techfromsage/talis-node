@@ -453,25 +453,34 @@ BabelClient.prototype.getAnnotations = function getAnnotations(token, querystrin
     querystringMap = querystringMap || {};
 
     var requestOptions = {
-        url: this._getBaseURL() + '/annotations?' + querystring.stringify(querystringMap),
-        headers: {
-            'Accept': 'application/json',
-            'Authorization':'Bearer '+token,
-            'Host': this.config.babel_hostname, 
-            'User-Agent': this.userAgent,
-        }
+      hostname: this.config.endpointUrl.hostname,
+      port: this.config.endpointUrl.port ? this.config.endpointUrl.port : (this.config.endpointUrl.protocol === 'https:' ? 443 : 80),
+      path: '/annotations?' + querystring.stringify(querystringMap),
+      method: "GET",
+      headers: {
+        'Accept': 'application/json',
+        'Authorization': 'Bearer ' + token,
+        'Host': this.config.endpointUrl.hostname,
+        'User-Agent': this.userAgent,
+      },
     };
 
-    this.debug(JSON.stringify(requestOptions));
+    var body = '';
+    const r = this.http.request(requestOptions, resp => {
+      resp.on("data", d => {
+        body += d;
+      });
 
-    request(requestOptions, function requestResponse(err, response, body){
-        if(err){
-            callback(err);
-        } else{
-            self._parseJSON(response, body, callback);
-        }
+      r.on('error', (err) => {
+        callback(err);
+      });
+
+      resp.on("end", d => {
+        self._parseJSON(resp, body, callback);
+      });
     });
 
+    r.end();
 };
 
 /**
@@ -579,9 +588,21 @@ BabelClient.prototype.createAnnotation = function createAnnotation(token, data, 
 
       resp.on("end", d => {
         if (parseInt(resp.statusCode / 100) !== 2) {
-            var babelError = new Error('Error creating annotation: ' + JSON.stringify(body));
+            // var babelError = new Error('Error creating annotation: ' + JSON.stringify(body));
+            var babelError = new Error('Error creating annotation: ' + body);
             babelError.http_code = resp && resp.statusCode ? resp.statusCode : 404;
             callback(babelError);
+
+            // var babelError = new Error();
+            // var bodyObject = JSON.parse(body);
+            // var errorDescription = bodyObject.error_description ? bodyObject.error_description : bodyObject.message;
+            // try {
+            //     babelError.message = errorDescription;
+            // } catch (e) {
+            //     babelError.message = body;
+            // }
+            // babelError.http_code = resp && resp.statusCode ? resp.statusCode : 404;
+            // callback(babelError);
         } else {
           callback(null, JSON.parse(body));
           return;

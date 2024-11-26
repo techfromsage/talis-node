@@ -63,7 +63,7 @@ describe("Babel Node Client Smoke Test Against Local Babel", function(){
     result.feeds[0].should.have.property('status', 'success');
   });
 
-  it("should get annotations", async function(){
+  it("should get annotation", async function(){
     var createResult = await createAnnotation(token, annotation);
     await sleep(1000);
     var getResult = await getAnnotation(token, createResult._id);
@@ -74,6 +74,16 @@ describe("Babel Node Client Smoke Test Against Local Babel", function(){
     getResult.hasTarget.uri.should.equal("http://target/1234567890");
     getResult.annotatedBy.should.equal("1234567890");
     getResult.motivatedBy.should.equal("commenting");
+  });
+
+  it("should get annotatioins", async function(){
+    var createResult = await createAnnotation(token, annotation);
+    await sleep(1000);
+    var getResult = await getAnnotations(token, {});
+
+    getResult.limit.should.equal(25);
+    getResult.offset.should.equal(0);
+    getResult.annotations.should.have.lengthOf(25);
   });
 
   it("should create, update and delete annotation", async function(){
@@ -141,6 +151,18 @@ describe("Babel Node Client Smoke Test Against Local Babel", function(){
   function getAnnotation(token, id){
     return new Promise((resolve, reject) => {
       babelClient.getAnnotation(token, id, function(err, result){
+        if(err){
+          reject(err);
+        }else{
+          resolve(result);
+        }
+      });
+    });
+  }
+
+  function getAnnotations(token, queryStringMap){
+    return new Promise((resolve, reject) => {
+      babelClient.getAnnotations(token, queryStringMap, function(err, result){
         if(err){
           reject(err);
         }else{
