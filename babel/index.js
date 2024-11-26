@@ -709,7 +709,7 @@ BabelClient.prototype.updateAnnotation = function updateAnnotation(token, data, 
 
       resp.on("end", d => {
         if (parseInt(resp.statusCode / 100) !== 2) {
-            var babelError = new Error('Error updating annotation: ' + JSON.stringify(body));
+            var babelError = new Error('Error updating annotation: ' + body);
             babelError.http_code = resp && resp.statusCode ? resp.statusCode : 404;
             callback(babelError);
         } else {
@@ -763,7 +763,7 @@ BabelClient.prototype.deleteAnnotation = function deleteAnnotation(token, annota
 
       resp.on("end", d => {
         if (resp.statusCode !== 204){
-            var babelError = new Error('Error deleting annotation: ' + JSON.stringify(body));
+            var babelError = new Error('Error deleting annotation: ' + body);
             babelError.http_code = resp.statusCode;
             callback(babelError);
         } else {
