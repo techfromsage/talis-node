@@ -1420,7 +1420,6 @@ describe("Babel Node Client Test Suite", function(){
             babelClient.updateAnnotation('secret', {_id: 'testid', hasBody:{format:'text/plain', type:'Text'}, hasTarget:{uri:'http://example.com'}, annotatedBy:'Gordon Freeman'}, function(err, result){
                 (err === null).should.be.false;
                 err.http_code.should.equal(401);
-                // err.message.should.equal('The token is invalid or has expired');
                 // TODO This is a change - but all the other error handling tests are like this
                 // if I make this one pass without change - then all the others fail. 
 
