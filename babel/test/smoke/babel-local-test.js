@@ -5,9 +5,9 @@ var sinon = require('sinon');
 const fs = require('fs');
 
 describe("Babel Node Client Smoke Test Against Local Babel", function(){
-  // Create a token by running the following command in the project root:
-  //   persona-token local > persona-token.txt
-  var token = fs.readFileSync('persona-token.txt', 'utf8').trim();
+  //   Run these smoke tests setting the PERSONA_TOKEN environment variable 
+  //     PERSONA_TOKEN=$(persona-token local) npm run echo-smoke-test
+  var token = process.env.PERSONA_TOKEN;
 
   var babelClient = babel.createClient({
     babel_host:"http://babel.talis.local",

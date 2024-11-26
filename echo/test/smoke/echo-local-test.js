@@ -5,13 +5,13 @@ var sinon = require('sinon');
 const fs = require('fs');
 
 describe("Echo Node Client Smoke Test Against Local Echo", function(){
+  //   Run these smoke tests setting the PERSONA_TOKEN environment variable 
+  //     PERSONA_TOKEN=$(persona-token local) npm run echo-smoke-test
+  var token = process.env.PERSONA_TOKEN;
+
   var echoClient = echo.createClient({
     echo_endpoint: "http://echo.talis.local"
   });
-
-  // Create a token by running the following command in the project root:
-  //   persona-token local > persona-token.txt
-  var token = fs.readFileSync('persona-token.txt', 'utf8').trim();
 
   it("- should post an event", async function(){
     var event = {
