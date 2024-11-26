@@ -1,8 +1,6 @@
 'use strict';
 
 var _ = require('lodash'),
-    request = require('request'),
-    rpn = require('request-promise-native'),
     md5 = require('md5'),
     querystring = require('querystring');
 
@@ -36,7 +34,11 @@ var BabelClient = function babelClient(config) {
         throw new Error('Invalid Babel config: babel_host');
     }
 
-    this.config.babel_hostname = this.config.babel_host.split('://', 2)[1];
+    var port = config.babel_port ? config.babel_port : (config.babel_host === 'https:' ? 443 : 80);
+    this.config.endpointUrl = new URL(`${config.babel_host}:${port}`);
+
+    var scheme = this.config.endpointUrl.protocol;
+    this.http = require(scheme === 'https:' ? 'https' : 'http');
 
     this.userAgent = (process && _.has(process, ["version", "env.NODE_ENV"])) ? "talis-node/" +
         clientVer + " (nodejs/" + process.version + "; NODE_ENV=" +
@@ -71,30 +73,41 @@ BabelClient.prototype.headTargetFeed = function headTargetFeed(target, token, pa
     var queryString = this._queryStringParams(params);
 
     var requestOptions = {
-        method: "HEAD",
-        url: this._getBaseURL() +
-            '/feeds/targets/'+md5(target)+'/activity/annotations' + (!_.isEmpty(queryString) ? '?'+queryString : ''),
-        headers: {
-            'Accept': 'application/json',
-            'Authorization':'Bearer '+token,
-            'Host': this.config.babel_hostname,
-            'User-Agent': this.userAgent,
-        }
+      hostname: this.config.endpointUrl.hostname,
+      port: this.config.endpointUrl.port ? this.config.endpointUrl.port : (this.config.endpointUrl.protocol === 'https:' ? 443 : 80),
+      path: '/feeds/targets/'+md5(target)+'/activity/annotations' + (!_.isEmpty(queryString) ? '?'+queryString : ''),
+      method: "HEAD",
+      headers: {
+        Accept: 'application/json',
+        Authorization: 'Bearer ' + token,
+        'Host': this.config.endpointUrl.hostname,
+        'User-Agent': this.userAgent,
+      },
     };
 
-    this.debug(JSON.stringify(requestOptions));
+    var body = '';
+    const r = this.http.request(requestOptions, resp => {
+      resp.on("data", d => {
+        body += d;
+      });
 
-    request(requestOptions, function requestResponse(err, response){
-        if(err){
-            callback(err);
-        } else if(response.statusCode && response.statusCode !== 204){
+      resp.on('error', (e) => {
+        callback(e);
+      });
+
+      resp.on("end", d => {
+        if (resp.statusCode !== 204){
             var babelError = new Error();
-            babelError.http_code = response.statusCode || 404;
+            babelError.http_code = resp.statusCode;
             callback(babelError);
-        } else{
-            callback(null, response);
+        } else {
+          callback(null, resp);
+          return;
         }
+      });
     });
+
+    r.end();
 };
 
 BabelClient.prototype.getEntireTargetFeed = async function (target, token, hydrate, callback) {
@@ -125,21 +138,20 @@ BabelClient.prototype.getEntireTargetFeed = async function (target, token, hydra
             offset: currentPage * perPage,
         })
 
-        const requestOptions = {
-            json: true,
-            simple: false,
-            resolveWithFullResponse: true,
-            method: 'GET',
-            url:  this._getBaseURL()
-                + '/feeds/targets/'
+        var requestOptions = {
+            hostname: this.config.endpointUrl.hostname,
+            port: this.config.endpointUrl.port ? this.config.endpointUrl.port : (this.config.endpointUrl.protocol === 'https:' ? 443 : 80),
+            path: '/feeds/targets/'
                 + md5(target)
                 + '/activity/annotations'
                 + ((hydrate === true) ? '/hydrate' : '')
                 + (!_.isEmpty(queryString) ? '?'+queryString : ''),
+            method: "GET",
             headers: {
-                'Accept': 'application/json',
-                'Authorization':'Bearer '+ token,
-                'Host': this.config.babel_hostname,
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token,
+                'Host': this.config.endpointUrl.hostname,
                 'User-Agent': this.userAgent,
             },
         };
@@ -147,16 +159,15 @@ BabelClient.prototype.getEntireTargetFeed = async function (target, token, hydra
         this.debug(JSON.stringify(requestOptions));
 
         try {
+            const response = await this.requestAsync(requestOptions);
+
             const {
-                body: {
-                    feed_length,
-                    annotations,
-                    userProfiles,
-                    error,
-                    error_description,
-                },
-                ...response
-            } = await rpn(requestOptions);
+              feed_length,
+              annotations,
+              userProfiles,
+              error,
+              error_description,
+            } = response;
 
             if (error) {
                 callbackError = new Error(error_description);
@@ -178,7 +189,7 @@ BabelClient.prototype.getEntireTargetFeed = async function (target, token, hydra
             }
 
         } catch (error) {
-            this.error(`Error fetching babel feed ${JSON.stringify(error)}`);
+            this.error(`Error fetching babel feed ${error}`);
             callbackError = error;
         }
 
@@ -187,6 +198,67 @@ BabelClient.prototype.getEntireTargetFeed = async function (target, token, hydra
 
     return callback(callbackError, results);
 }
+
+BabelClient.prototype.requestAsync = async function (requestOptions) {
+  return new Promise((resolve, reject) => {
+    var body = '';
+    const r = this.http.request(requestOptions, resp => {
+      resp.on("data", d => {
+        body += d;
+      });
+
+      resp.on('error', (e) => {
+        callback(e);
+      });
+
+      resp.on("end", d => {
+        if (parseInt(resp.statusCode / 100) !== 2) {
+          reject({http_code: resp.statusCode, message: JSON.parse(body).error_description});
+          return;
+        } else {
+          var jsonBody = JSON.parse(body);
+          if(jsonBody.error){
+              var statusCode = jsonBody.statusCode ? jsonBody.statusCode : 400;
+              var message = jsonBody.error_description ? jsonBody.error_description : 'UNKNOWN';
+              reject({http_code: statusCode, message: message});
+              return;
+          } else {
+              resolve(jsonBody);
+          }
+          return;
+        }
+      });
+    });
+
+    r.end();
+  });
+}
+
+async function getTargetFeedAsync(target, token, hydrate, callback) {
+    var body = '';
+    const r = this.http.request(requestOptions, resp => {
+      resp.on("data", d => {
+        body += d;
+      });
+
+      resp.on('error', (e) => {
+        callback(e);
+      });
+
+      resp.on("end", d => {
+        if (resp.statusCode !== 204){
+            var babelError = new Error();
+            babelError.http_code = resp.statusCode;
+            callback(babelError);
+        } else {
+          callback(null, resp);
+          return;
+        }
+      });
+    });
+
+    r.end();
+};
 
 /**
  * Get a feed based off a target identifier. Return either a list of feed identifiers, or hydrate it and
@@ -222,25 +294,34 @@ BabelClient.prototype.getTargetFeed = function getTargetFeed(target, token, hydr
     var queryString = this._queryStringParams(params);
 
     var requestOptions = {
-        url: this._getBaseURL() +
-          '/feeds/targets/'+md5(target)+'/activity/annotations'+((hydrate === true) ? '/hydrate' : '') + (!_.isEmpty(queryString) ? '?'+queryString : ''),
-        headers: {
-            'Accept': 'application/json',
-            'Authorization':'Bearer '+token,
-            'Host': this.config.babel_hostname,
-            'User-Agent': this.userAgent,
-        }
+      hostname: this.config.endpointUrl.hostname,
+      port: this.config.endpointUrl.port ? this.config.endpointUrl.port : (this.config.endpointUrl.protocol === 'https:' ? 443 : 80),
+      path: '/feeds/targets/'+md5(target)+'/activity/annotations'+((hydrate === true) ? '/hydrate' : '') + (!_.isEmpty(queryString) ? '?'+queryString : ''),
+      method: "GET",
+      headers: {
+        Accept: 'application/json',
+        Authorization: 'Bearer ' + token,
+        'Host': this.config.endpointUrl.hostname,
+        'User-Agent': this.userAgent,
+      },
     };
 
-    this.debug(JSON.stringify(requestOptions));
+    var body = '';
+    const r = this.http.request(requestOptions, resp => {
+      resp.on("data", d => {
+        body += d;
+      });
 
-    request(requestOptions, function requestResponse(err, response, body){
-        if(err){
-            callback(err);
-        } else{
-            self._parseJSON(response, body, callback);
-        }
+      resp.on('error', (e) => {
+        callback(e);
+      });
+
+      resp.on("end", d => {
+        self._parseJSON(resp, body, callback);
+      });
     });
+
+    r.end();
 };
 
 /***
@@ -266,24 +347,34 @@ BabelClient.prototype.getFeeds = function getFeeds(feeds, token, callback) {
     feeds = feeds.join(",");
 
     var requestOptions = {
-        url: this._getBaseURL() + '/feeds/annotations/hydrate?feed_ids=' + encodeURIComponent(feeds),
-        headers: {
-            'Accept': 'application/json',
-            'Authorization': 'Bearer ' + token,
-            'Host': this.config.babel_hostname,
-            'User-Agent': this.userAgent,
-        }
+      hostname: this.config.endpointUrl.hostname,
+      port: this.config.endpointUrl.port ? this.config.endpointUrl.port : (this.config.endpointUrl.protocol === 'https:' ? 443 : 80),
+      path: '/feeds/annotations/hydrate?feed_ids=' + encodeURIComponent(feeds),
+      method: "GET",
+      headers: {
+        Accept: 'application/json',
+        Authorization: 'Bearer ' + token,
+        'Host': this.config.endpointUrl.hostname,
+        'User-Agent': this.userAgent,
+      },
     };
 
-    this.debug(JSON.stringify(requestOptions));
+    var body = '';
+    const r = this.http.request(requestOptions, resp => {
+      resp.on("data", d => {
+        body += d;
+      });
 
-    request(requestOptions, function requestResponse(err, response, body) {
-        if (err) {
-            callback(err);
-        } else {
-            self._parseJSON(response, body, callback);
-        }
+      resp.on('error', (e) => {
+        callback(e);
+      });
+
+      resp.on("end", d => {
+        self._parseJSON(resp, body, callback);
+      });
     });
+
+    r.end();
 };
 
 /**
@@ -305,24 +396,36 @@ BabelClient.prototype.getAnnotation = function getAnnotation(token, id, callback
     var self = this;
 
     var requestOptions = {
-        url: this._getBaseURL() + '/annotations/'+id,
-        headers: {
-            'Accept': 'application/json',
-            'Authorization':'Bearer '+token,
-            'Host': this.config.babel_hostname,
-            'User-Agent': this.userAgent,
-        }
+      hostname: this.config.endpointUrl.hostname,
+      port: this.config.endpointUrl.port ? this.config.endpointUrl.port : (this.config.endpointUrl.protocol === 'https:' ? 443 : 80),
+      path:  '/annotations/' + id,
+      method: "GET",
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token,
+        'User-Agent': this.userAgent,
+      },
     };
 
-    this.debug(JSON.stringify(requestOptions));
+    var self = this;
 
-    request(requestOptions, function requestResponse(err, response, body){
-        if(err){
-            callback(err);
-        } else{
-            self._parseJSON(response, body, callback);
-        }
+    var body = '';
+    const r = this.http.request(requestOptions, resp => {
+      resp.on("data", d => {
+        body += d;
+      });
+
+      r.on('error', (err) => {
+        callback(err);
+      });
+
+      resp.on("end", d => {
+        self._parseJSON(resp, body, callback);
+      });
     });
+
+    r.end();
 };
 
 /**
@@ -350,25 +453,34 @@ BabelClient.prototype.getAnnotations = function getAnnotations(token, querystrin
     querystringMap = querystringMap || {};
 
     var requestOptions = {
-        url: this._getBaseURL() + '/annotations?' + querystring.stringify(querystringMap),
-        headers: {
-            'Accept': 'application/json',
-            'Authorization':'Bearer '+token,
-            'Host': this.config.babel_hostname, 
-            'User-Agent': this.userAgent,
-        }
+      hostname: this.config.endpointUrl.hostname,
+      port: this.config.endpointUrl.port ? this.config.endpointUrl.port : (this.config.endpointUrl.protocol === 'https:' ? 443 : 80),
+      path: '/annotations?' + querystring.stringify(querystringMap),
+      method: "GET",
+      headers: {
+        'Accept': 'application/json',
+        'Authorization': 'Bearer ' + token,
+        'Host': this.config.endpointUrl.hostname,
+        'User-Agent': this.userAgent,
+      },
     };
 
-    this.debug(JSON.stringify(requestOptions));
+    var body = '';
+    const r = this.http.request(requestOptions, resp => {
+      resp.on("data", d => {
+        body += d;
+      });
 
-    request(requestOptions, function requestResponse(err, response, body){
-        if(err){
-            callback(err);
-        } else{
-            self._parseJSON(response, body, callback);
-        }
+      r.on('error', (err) => {
+        callback(err);
+      });
+
+      resp.on("end", d => {
+        self._parseJSON(resp, body, callback);
+      });
     });
 
+    r.end();
 };
 
 /**
@@ -445,16 +557,17 @@ BabelClient.prototype.createAnnotation = function createAnnotation(token, data, 
     });
 
     var requestOptions = {
-        method:'POST',
-        body:data,
-        json:true,
-        url: this._getBaseURL() + '/annotations',
-        headers: {
-            'Accept': 'application/json',
-            'Authorization':'Bearer '+token,
-            'Host': this.config.babel_hostname,
-            'User-Agent': this.userAgent,
-        }
+      hostname: this.config.endpointUrl.hostname,
+      port: this.config.endpointUrl.port ? this.config.endpointUrl.port : (this.config.endpointUrl.protocol === 'https:' ? 443 : 80),
+      path: '/annotations',
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+        Authorization: 'Bearer ' + token,
+        'Host': this.config.endpointUrl.hostname,
+        'User-Agent': this.userAgent,
+      },
     };
 
     // if options.xIngestSynchronously set to true, then and only then add the header
@@ -463,19 +576,30 @@ BabelClient.prototype.createAnnotation = function createAnnotation(token, data, 
         requestOptions.headers['X-Ingest-Synchronously'] = 'true';
     }
 
-    this.debug(JSON.stringify(requestOptions));
+    var body = '';
+    const r = this.http.request(requestOptions, resp => {
+      resp.on("data", d => {
+        body += d;
+      });
 
-    request.post(requestOptions, function requestResponse(err, response, body){
-        if (err) {
-            callback(err);
-        } else if (!this._responseSuccessful(response)) {
-            var babelError = new Error('Error creating annotation: ' + JSON.stringify(body));
-            babelError.http_code = response && response.statusCode ? response.statusCode : 404;
+      resp.on('error', (e) => {
+        callback(e);
+      });
+
+      resp.on("end", d => {
+        if (parseInt(resp.statusCode / 100) !== 2) {
+            var babelError = new Error('Error creating annotation: ' + body);
+            babelError.http_code = resp && resp.statusCode ? resp.statusCode : 404;
             callback(babelError);
         } else {
-            callback(null, body);
+          callback(null, JSON.parse(body));
+          return;
         }
-    }.bind(this));
+      });
+    });
+
+    r.write(JSON.stringify(data));
+    r.end();
 };
 
 /**
@@ -548,31 +672,43 @@ BabelClient.prototype.updateAnnotation = function updateAnnotation(token, data, 
     });
 
     var requestOptions = {
-        method: 'PUT',
-        body: data,
-        json: true,
-        url: this._getBaseURL() + '/annotations/' + data._id,
-        headers: {
-            'Accept': 'application/json',
-            'Authorization': 'Bearer ' + token,
-            'Host': this.config.babel_hostname,
-            'User-Agent': this.userAgent,
-        }
+      hostname: this.config.endpointUrl.hostname,
+      port: this.config.endpointUrl.port ? this.config.endpointUrl.port : (this.config.endpointUrl.protocol === 'https:' ? 443 : 80),
+      path: '/annotations/' + data._id,
+      method: "PUT",
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+        Authorization: 'Bearer ' + token,
+        'Host': this.config.endpointUrl.hostname,
+        'User-Agent': this.userAgent,
+      },
     };
 
-    this.debug(JSON.stringify(requestOptions));
+    var body = '';
+    const r = this.http.request(requestOptions, resp => {
+      resp.on("data", d => {
+        body += d;
+      });
 
-    request.put(requestOptions, function requestResponse(err, response, body){
-        if (err) {
-            callback(err);
-        } else if (!this._responseSuccessful(response)) {
-            var babelError = new Error('Error updating annotation: ' + JSON.stringify(body));
-            babelError.http_code = response && response.statusCode ? response.statusCode : 404;
+      resp.on('error', (e) => {
+        callback(e);
+      });
+
+      resp.on("end", d => {
+        if (parseInt(resp.statusCode / 100) !== 2) {
+            var babelError = new Error('Error updating annotation: ' + body);
+            babelError.http_code = resp && resp.statusCode ? resp.statusCode : 404;
             callback(babelError);
         } else {
-            callback(null, body);
+          callback(null, JSON.parse(body));
+          return;
         }
-    }.bind(this));
+      });
+    });
+
+    r.write(JSON.stringify(data));
+    r.end();
 };
 
 /**
@@ -591,32 +727,41 @@ BabelClient.prototype.deleteAnnotation = function deleteAnnotation(token, annota
     }
 
     var requestOptions = {
-        method: 'DELETE',
-        json: true,
-        url: this._getBaseURL() + '/annotations/' + annotationId,
-        headers: {
-            'Accept': 'application/json',
-            'Authorization': 'Bearer ' + token,
-            'Host': this.config.babel_hostname,
-            'User-Agent': this.userAgent,
-        }
+      hostname: this.config.endpointUrl.hostname,
+      port: this.config.endpointUrl.port ? this.config.endpointUrl.port : (this.config.endpointUrl.protocol === 'https:' ? 443 : 80),
+      path: '/annotations/' + annotationId,
+      method: "DELETE",
+      headers: {
+        Accept: 'application/json',
+        Authorization: 'Bearer ' + token,
+        'Host': this.config.endpointUrl.hostname,
+        'User-Agent': this.userAgent,
+      },
     };
 
-    this.debug(JSON.stringify(requestOptions));
+    var body = '';
+    const r = this.http.request(requestOptions, resp => {
+      resp.on("data", d => {
+        body += d;
+      });
 
-    request.delete(requestOptions, function requestResponse(err, response, body){
-        if (err) {
-            callback(err);
+      resp.on('error', (e) => {
+        callback(e);
+      });
+
+      resp.on("end", d => {
+        if (resp.statusCode !== 204){
+            var babelError = new Error('Error deleting annotation: ' + body);
+            babelError.http_code = resp.statusCode;
+            callback(babelError);
         } else {
-            if (response.statusCode !== 204){
-                var babelError = new Error('Error deleting annotation: ' + JSON.stringify(body));
-                babelError.http_code = response.statusCode;
-                callback(babelError);
-            } else {
-                callback(null, null);
-            }
+          callback(null, null);
+          return;
         }
+      });
     });
+
+    r.end();
 };
 
 /**

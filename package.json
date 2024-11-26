@@ -1,12 +1,15 @@
 {
   "name": "talis-node",
-  "version": "0.2.1",
+  "version": "0.2.3",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "./node_modules/.bin/mocha --exit --timeout 20000 **/test/**/*.js",
+    "test": "npm run unit-test && npm run integration-test",
     "integration-test": "./node_modules/.bin/mocha --exit --timeout 20000 **/test/integration/**/*.js",
     "unit-test": "./node_modules/.bin/mocha --exit --timeout 20000 **/test/unit/**/*.js",
+    "echo-smoke-test": "./node_modules/.bin/mocha --exit --timeout 20000 echo/test/smoke/**/*.js",
+    "babel-smoke-test": "./node_modules/.bin/mocha --exit --timeout 20000 babel/test/smoke/**/*.js",
+    "persona-smoke-test": "./node_modules/.bin/mocha --exit --timeout 20000 persona/test/smoke/**/*.js",
     "lint": "./node_modules/.bin/jshint index.js",
     "lint-fix": "./node_modules/.bin/js-beautify -r index.js"
   },
@@ -18,8 +21,6 @@
     "lodash": "4.17.21",
     "md5": "2.2.1",
     "node-cache": "4.2.0",
-    "request": "2.88.2",
-    "request-promise-native": "^1.0.8",
     "uuid": "2.0.2"
   },
   "devDependencies": {
@@ -30,7 +31,6 @@
     "mocha": "5.2.0",
     "nock": "13.3.3",
     "proxyquire": "2.1.0",
-    "rewire": "2.1.4",
     "should": "13.2.3",
     "sinon": "3.0.0"
   },

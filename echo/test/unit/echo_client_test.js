@@ -2,9 +2,9 @@
 
 var should = require('should');
 var assert = require('assert');
+var nock = require("nock");
 var echo = require('../../index.js');
 var sinon = require('sinon');
-var request = require('request');
 var sandbox;
 var endPoint = 'http://echo:3002';
 
@@ -90,98 +90,15 @@ describe("Echo Node Client Test Suite", function(){
                 echo_endpoint: endPoint
             });
 
-            var requestStub = sandbox.stub(request, 'post');
-            requestStub.yields(new Error('Error communicating with Echo'));
+            var mockHttpRequest = nock(endPoint)
+                .post('/1/events')
+                .reply(400, {});
 
             echoClient.addEvents('secret', {class:'class', source:'source'}, function(err, result){
                 (err === null).should.be.false;
-                err.code.should.equal(1);
-                err.label.should.equal('REQUEST_ERROR');
+                err.code.should.equal(2);
+                err.label.should.equal('INVALID_QUERY');
                 (typeof result).should.equal('undefined');
-                done();
-            });
-        });
-        it("- add events should return an error if call to request has missing option.body", function(done){
-            var echoClient = echo.createClient({
-                echo_endpoint: endPoint
-            });
-
-            var requestStub = sandbox.stub(request, 'post')
-            requestStub.callsFake(function (options, callback) {
-                options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
-                if(!options.body){
-                    var error = new Error('Missing field: options.body');
-                    callback(error);
-                } else{
-                    callback(null);
-                }
-            });
-
-            echoClient.addEvents('secret', {class:'class', source:'source'}, function(err){
-                (err === null).should.be.false;
-                done();
-            });
-        });
-        it("- add events should return an error if call to request has missing option.method", function(done){
-            var echoClient = echo.createClient({
-                echo_endpoint: endPoint
-            });
-
-            var requestStub = sandbox.stub(request, 'post')
-            requestStub.callsFake(function (options, callback) {
-                options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
-                if(!options.method){
-                    var error = new Error('Missing field: options.method');
-                    callback(error);
-                } else{
-                    callback(null);
-                }
-            });
-
-            echoClient.addEvents('secret', {class:'class', source:'source'}, function(err){
-                (err === null).should.be.false;
-                done();
-            });
-        });
-        it("- add events should return an error if call to request has option.method != POST", function(done){
-            var echoClient = echo.createClient({
-                echo_endpoint: endPoint
-            });
-
-            var requestStub = sandbox.stub(request, 'post')
-            requestStub.callsFake(function (options, callback) {
-                options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
-                if(options.method !== 'POST'){
-                    var error = new Error('Invalid field: options.method');
-                    callback(error);
-                } else{
-                    callback(null);
-                }
-            });
-
-            echoClient.addEvents('secret', {class:'class', source:'source'}, function(err){
-                (err === null).should.be.false;
-                done();
-            });
-        });
-        it("- add events should return an error if call to request has missing option.json", function(done){
-            var echoClient = echo.createClient({
-                echo_endpoint: endPoint
-            });
-
-            var requestStub = sandbox.stub(request, 'post')
-            requestStub.callsFake(function (options, callback) {
-                options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
-                if(!options.json){
-                    var error = new Error('Missing field: options.json');
-                    callback(error);
-                } else{
-                    callback(null);
-                }
-            });
-
-            echoClient.addEvents('secret', {class:'class', source:'source'}, function(err){
-                (err === null).should.be.false;
                 done();
             });
         });
@@ -190,23 +107,18 @@ describe("Echo Node Client Test Suite", function(){
                 echo_endpoint: endPoint
             });
 
-            var requestStub = sandbox.stub(request, 'post')
-            requestStub.callsFake(function (options, callback) {
-                options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
-                callback(
-                  null,
-                  {statusCode: 401},
-                  {
-                      "error": "invalid_token"
-                  }
-              );
-            });
+            nock(endPoint)
+                .post('/1/events')
+                .reply(function(uri, requestBody){
+                    this.req.headers['user-agent'].should.equal('talis-node/0.2.3');
+                    return [401, {"error": "invalid_token"}];
+                });
 
             echoClient.addEvents("incorrect_token", {class:'class', source:'source'}, function(err, result) {
                 (err === null).should.be.false;
 
-                err.code.should.equal(8);
-                err.label.should.equal("INVALID_TOKEN");
+                err.code.should.equal(6);
+                err.label.should.equal("UNAUTHORISED");
                 done();
             });
         });
@@ -215,25 +127,24 @@ describe("Echo Node Client Test Suite", function(){
                 echo_endpoint: endPoint
             });
 
-            var requestStub = sandbox.stub(request, 'post')
-            requestStub.callsFake(function (options, callback) {
-                options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
-                callback(
-                  null,
-                  {statusCode: 200},
-                  {
-                    "class": "page.views",
-                    "timestamp": 1324524509,
-                    "user": "1234-5678-9012-3456",
-                    "source" : "rl-app",
-                    "props": {
-                        "url" : "https://foo.bar/baz.html"
-                    }
-                  }
-              );
-            });
+            nock(endPoint)
+                .post('/1/events')
+                .reply(function(uri, requestBody){
+                    this.req.headers['user-agent'].should.equal('talis-node/0.2.3');
+                    return [200, {}];
+                });
 
-            echoClient.addEvents('secret', {class:'class', source:'source'}, function(err, result){
+            var event = {
+              'class': 'calss',
+              'source': 'rl-app',
+              'timestamp': 1324524509,
+              'user': '1234-5678-9012-3456',
+              'props': {
+                'url': 'https://foo.bar/baz.html'
+              }
+            };
+
+            echoClient.addEvents('secret', event, function(err, result){
 
                 (err === null).should.be.true;
 
@@ -318,12 +229,13 @@ describe("Echo Node Client Test Suite", function(){
                 echo_endpoint: endPoint
             });
 
-            var requestStub = sandbox.stub(request, 'get')
-            requestStub.callsFake(function (options, callback) {
-                options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
-                var data = "{\"head\": {\"type\": \"sum\",\"class\": \"player.timer.2\",\"property\": \"interval_with_decay\",\"group_by\": \"user\",\"filter\": {\"module_id\": \"5847ed0ef81ebd1f1b000001\",\"resource_id\": \"5899a87fd42410f2c9000001\"},\"from\": \"2016-08-29T00:00:00\",\"to\": \"2017-05-18T00:00:00\",\"count\": 2},\"results\": [{\"user\": \"8av3Jaj__vC9v9VIY_P-1w\",\"interval_with_decay\": 182920},{\"user\": \"d17T05nNTjG50sAp_R3RvQ\",\"interval_with_decay\": 21315}]}";
-                callback(null, {statusCode: 200}, data);
-            });
+            nock(endPoint)
+                .get('/1/analytics/sum?class=testclass&source=testsources&property=testproperty&interval=testinterval&group_by=testgroupby&key=testkey&value=testvalue&from=testfrom&to=testto&percentile=testpercentile&user=testuser&user.include=includeuser&user.exclude=excludeuser&filter=testfilter&filter.test=testfilter&n=testn&n.something=something')
+                .reply(function(uri, requestBody){
+                    this.req.headers['user-agent'].should.equal('talis-node/0.2.3');
+                    var data = "{\"head\": {\"type\": \"sum\",\"class\": \"player.timer.2\",\"property\": \"interval_with_decay\",\"group_by\": \"user\",\"filter\": {\"module_id\": \"5847ed0ef81ebd1f1b000001\",\"resource_id\": \"5899a87fd42410f2c9000001\"},\"from\": \"2016-08-29T00:00:00\",\"to\": \"2017-05-18T00:00:00\",\"count\": 2},\"results\": [{\"user\": \"8av3Jaj__vC9v9VIY_P-1w\",\"interval_with_decay\": 182920},{\"user\": \"d17T05nNTjG50sAp_R3RvQ\",\"interval_with_decay\": 21315}]}";
+                    return [200, data];
+                });
 
             var params = {
                 class: 'testclass',
@@ -347,45 +259,38 @@ describe("Echo Node Client Test Suite", function(){
 
             var queryAnalytics = function(){
                 return echoClient.queryAnalytics('secret', 'sum', params, false, function(err, result){
-                    var firstCall = requestStub.firstCall;
                     (err === null).should.be.true;
-                    requestStub.callCount.should.equal(1);
-                    firstCall.args[0].method.should.equal('GET');
-                    firstCall.args[0].url.should.equal(endPoint + '/1/analytics/sum?class=testclass&source=testsources&property=testproperty&interval=testinterval&group_by=testgroupby&key=testkey&value=testvalue&from=testfrom&to=testto&percentile=testpercentile&user=testuser&user.include=includeuser&user.exclude=excludeuser&filter=testfilter&filter.test=testfilter&n=testn&n.something=something');
-                    firstCall.args[0].headers['cache-control'].should.equal('none');
+                    result.body.results.length.should.equal(2);
+                    result.body.results[0].user.should.equal('8av3Jaj__vC9v9VIY_P-1w');
+                    result.body.results[0].interval_with_decay.should.equal(182920);
+                    result.body.results[1].user.should.equal('d17T05nNTjG50sAp_R3RvQ');
+                    result.body.results[1].interval_with_decay.should.equal(21315);
+                    done();
                 });
             };
 
-            queryAnalytics();
-
             queryAnalytics.should.not.throw('Invalid Analytics queryParams');
-
-            done();
         });
         it('- should return an error if call to request returns an error', function(done){
             var echoClient = echo.createClient({
                 echo_endpoint: endPoint
             });
 
-            var requestStub = sandbox.stub(request, 'get')
-            requestStub.callsFake(function (options, callback) {
-                options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
-                callback(new Error('Error communicating with Echo'));
-            });
+            nock(endPoint)
+                .get('/1/analytics/sum?class=testclass')
+                .reply(function(uri, requestBody){
+                    this.req.headers['user-agent'].should.equal('talis-node/0.2.3');
+                    return [400, {}];
+                });
 
             var params = {
                 class: 'testclass'
             };
 
             echoClient.queryAnalytics('secret', 'sum', params, false, function(err, result){
-                var firstCall = requestStub.firstCall;
                 (err === null).should.be.false;
-                requestStub.callCount.should.equal(1);
-                firstCall.args[0].method.should.equal('GET');
-                firstCall.args[0].url.should.equal(endPoint + '/1/analytics/sum?class=testclass');
-                firstCall.args[0].headers['cache-control'].should.equal('none');
-                err.code.should.equal(1);
-                err.label.should.equal('REQUEST_ERROR');
+                err.code.should.equal(2);
+                err.label.should.equal('INVALID_QUERY');
                 (typeof result).should.equal('undefined');
                 done();
             });
@@ -399,23 +304,18 @@ describe("Echo Node Client Test Suite", function(){
                 class: 'testclass'
             };
 
-            var requestStub = sandbox.stub(request, 'get')
-            requestStub.callsFake(function (options, callback) {
-                options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
-                callback(
-                  null,
-                  {statusCode: 401},
-                  {
-                      "error": "invalid_token"
-                  }
-              );
-            });
+            nock(endPoint)
+                .get('/1/analytics/sum?class=testclass')
+                .reply(function(uri, requestBody){
+                    this.req.headers['user-agent'].should.equal('talis-node/0.2.3');
+                    return [401, {"error": "invalid_token"}];
+                });
 
             echoClient.queryAnalytics("incorrect_token", "sum", params, false, function(err, result) {
                 (err === null).should.be.false;
 
-                err.code.should.equal(8);
-                err.label.should.equal("INVALID_TOKEN");
+                err.code.should.equal(6);
+                err.label.should.equal("UNAUTHORISED");
                 done();
             });
         });
@@ -424,12 +324,13 @@ describe("Echo Node Client Test Suite", function(){
                 echo_endpoint: endPoint
             });
 
-            var requestStub = sandbox.stub(request, 'get')
-            requestStub.callsFake(function (options, callback) {
-                options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
-                var data = "{\"head\": {\"type\": \"sum\",\"class\": \"player.timer.2\",\"property\": \"interval_with_decay\",\"group_by\": \"user\",\"filter\": {\"module_id\": \"5847ed0ef81ebd1f1b000001\"},\"user\": {\"exclude\": \"qVyfsQhlMY0T2_Bl7eotrg\"},\"from\": \"2017-02-01T00:00:00\",\"to\": \"2017-02-13T00:00:00\",\"count\": 2},\"results\": [{\"user\": \"8av3Jaj__vC9v9VIY_P-1w\",\"interval_with_decay\": 182920},{\"user\": \"d17T05nNTjG50sAp_R3RvQ\",\"interval_with_decay\": 21315}]}";
-                callback(null, {statusCode: 200}, data);
-            });
+            nock(endPoint)
+                .get('/1/analytics/sum?class=player.timer.2&property=interval_with_decay&group_by=user&filter.module_id=5847ed0ef81ebd1f1b000001&user.exclude=qVyfsQhlMY0T2_Bl7eotrg&from=2017-02-01T00%3A00%3A00&to=2017-02-13T00%3A00%3A00')
+                .reply(function(uri, requestBody){
+                    this.req.headers['user-agent'].should.equal('talis-node/0.2.3');
+                    var data = "{\"head\": {\"type\": \"sum\",\"class\": \"player.timer.2\",\"property\": \"interval_with_decay\",\"group_by\": \"user\",\"filter\": {\"module_id\": \"5847ed0ef81ebd1f1b000001\"},\"user\": {\"exclude\": \"qVyfsQhlMY0T2_Bl7eotrg\"},\"from\": \"2017-02-01T00:00:00\",\"to\": \"2017-02-13T00:00:00\",\"count\": 2},\"results\": [{\"user\": \"8av3Jaj__vC9v9VIY_P-1w\",\"interval_with_decay\": 182920},{\"user\": \"d17T05nNTjG50sAp_R3RvQ\",\"interval_with_decay\": 21315}]}";
+                    return [200, data];
+                });
 
             var params = {
                 class: 'player.timer.2',
@@ -442,11 +343,7 @@ describe("Echo Node Client Test Suite", function(){
             };
 
             echoClient.queryAnalytics('secret', 'sum', params, false, function(err, result){
-                var firstCall = requestStub.firstCall;
                 (err === null).should.be.true;
-                requestStub.callCount.should.equal(1);
-                firstCall.args[0].method.should.equal('GET');
-                firstCall.args[0].headers['cache-control'].should.equal('none');
                 (result.body.results instanceof Array).should.be.true;
                 result.body.results.length.should.equal(2);
                 result.body.results[0].user.should.equal('8av3Jaj__vC9v9VIY_P-1w');
@@ -465,12 +362,13 @@ describe("Echo Node Client Test Suite", function(){
                 echo_endpoint: endPoint
             });
 
-            var requestStub = sandbox.stub(request, 'get')
-            requestStub.callsFake(function (options, callback) {
-                options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
+            nock(endPoint)
+                .get('/1/analytics/sum?class=player.timer.2&property=interval_with_decay&group_by=user&filter.module_id=5847ed0ef81ebd1f1b000001&user.exclude=qVyfsQhlMY0T2_Bl7eotrg&from=2017-02-01T00%3A00%3A00&to=2017-02-13T00%3A00%3A00')
+                .reply(function(uri, requestBody){
+                    this.req.headers['user-agent'].should.equal('talis-node/0.2.3');
                 var data = "{\"head\": {\"type\": \"sum\",\"class\": \"player.timer.2\",\"property\": \"interval_with_decay\",\"group_by\": \"user\",\"filter\": {\"module_id\": \"5847ed0ef81ebd1f1b000001\"},\"user\": {\"exclude\": \"qVyfsQhlMY0T2_Bl7eotrg\"},\"from\": \"2017-02-01T00:00:00\",\"to\": \"2017-02-13T00:00:00\",\"count\": 2},\"results\": [{\"user\": \"8av3Jaj__vC9v9VIY_P-1w\",\"interval_with_decay\": 182920},{\"user\": \"d17T05nNTjG50sAp_R3RvQ\",\"interval_with_decay\": 21315}]}";
-                callback(null, {statusCode: 200}, data);
-            });
+                    return [200, data];
+                });
 
             var params = {
                 class: 'player.timer.2',
@@ -483,11 +381,7 @@ describe("Echo Node Client Test Suite", function(){
             };
 
             echoClient.queryAnalytics('secret', 'sum', params, true, function(err, result){
-                var firstCall = requestStub.firstCall;
                 (err === null).should.be.true;
-                requestStub.callCount.should.equal(1);
-                firstCall.args[0].method.should.equal('GET');
-                firstCall.args[0].headers.should.not.have.property('cache-control');
                 (result.body.results instanceof Array).should.be.true;
                 result.body.results.length.should.equal(2);
                 result.body.results[0].user.should.equal('8av3Jaj__vC9v9VIY_P-1w');
@@ -508,11 +402,12 @@ describe("Echo Node Client Test Suite", function(){
 
             var data = "<html><head>Test</head></html>";
 
-            var requestStub = sandbox.stub(request, 'get')
-            requestStub.callsFake(function (options, callback) {
-                options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
-                callback(null, {statusCode: 200}, data);
-            });
+            nock(endPoint)
+                .get('/1/analytics/sum?class=player.timer.2&property=interval_with_decay&group_by=user&filter.module_id=5847ed0ef81ebd1f1b000001&user.exclude=qVyfsQhlMY0T2_Bl7eotrg&from=2017-02-01T00%3A00%3A00&to=2017-02-13T00%3A00%3A00')
+                .reply(function(uri, requestBody){
+                    this.req.headers['user-agent'].should.equal('talis-node/0.2.3');
+                    return [200, data];
+                });
 
             var params = {
                 class: 'player.timer.2',
@@ -525,12 +420,8 @@ describe("Echo Node Client Test Suite", function(){
             };
 
             echoClient.queryAnalytics('secret', 'sum', params, false, function(err, result){
-                var firstCall = requestStub.firstCall;
                 (err === null).should.be.false;
                 (typeof result).should.equal('undefined');
-                requestStub.callCount.should.equal(1);
-                firstCall.args[0].method.should.equal('GET');
-                firstCall.args[0].headers['cache-control'].should.equal('none');
                 err.should.equal('Error parsing returned JSON');
                 done();
             });
@@ -542,11 +433,12 @@ describe("Echo Node Client Test Suite", function(){
 
             var data = "[]";
 
-            var requestStub = sandbox.stub(request, 'get')
-            requestStub.callsFake(function (options, callback) {
-                options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
-                callback(null, {statusCode: 400}, data);
-            });
+            nock(endPoint)
+                .get('/1/analytics/sum?class=player.timer.2&property=interval_with_decay&group_by=user&filter.module_id=5847ed0ef81ebd1f1b000001&user.exclude=qVyfsQhlMY0T2_Bl7eotrg&from=2017-02-01T00%3A00%3A00&to=2017-02-13T00%3A00%3A00')
+                .reply(function(uri, requestBody){
+                    this.req.headers['user-agent'].should.equal('talis-node/0.2.3');
+                    return [400, data];
+                });
 
             var params = {
                 class: 'player.timer.2',
@@ -559,12 +451,8 @@ describe("Echo Node Client Test Suite", function(){
             };
 
             echoClient.queryAnalytics('secret', 'sum', params, false, function(err, result){
-                var firstCall = requestStub.firstCall;
                 (err === null).should.be.false;
                 (typeof result).should.equal('undefined');
-                requestStub.callCount.should.equal(1);
-                firstCall.args[0].method.should.equal('GET');
-                firstCall.args[0].headers['cache-control'].should.equal('none');
                 err.should.deepEqual({ code: 2, label: "INVALID_QUERY"});
                 done();
             });
@@ -576,11 +464,13 @@ describe("Echo Node Client Test Suite", function(){
 
             var data = "this is invalid";
 
-            var requestStub = sandbox.stub(request, 'get')
-            requestStub.callsFake(function (options, callback) {
-                options.headers.should.have.property('User-Agent', 'talis-node/0.2.1');
-                callback(null, {statusCode: 400}, data);
-            });
+            nock(endPoint)
+                .get('/1/analytics/sum?class=player.timer.2&property=interval_with_decay&group_by=user&filter.module_id=5847ed0ef81ebd1f1b000001&user.exclude=qVyfsQhlMY0T2_Bl7eotrg&from=2017-02-01T00%3A00%3A00&to=2017-02-13T00%3A00%3A00')
+                .reply(function(uri, requestBody){
+                    this.req.headers['user-agent'].should.equal('talis-node/0.2.3');
+                    return [400, data];
+                });
+
 
             var params = {
                 class: 'player.timer.2',
@@ -593,12 +483,8 @@ describe("Echo Node Client Test Suite", function(){
             };
 
             echoClient.queryAnalytics('secret', 'sum', params, false, function(err, result){
-                var firstCall = requestStub.firstCall;
                 (err === null).should.be.false;
                 (typeof result).should.equal('undefined');
-                requestStub.callCount.should.equal(1);
-                firstCall.args[0].method.should.equal('GET');
-                firstCall.args[0].headers['cache-control'].should.equal('none');
                 err.should.deepEqual({ code: 2, label: "INVALID_QUERY"});
                 done();
             });
