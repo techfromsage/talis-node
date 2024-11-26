@@ -161,8 +161,8 @@ function Client() {
     });
 
     endpointUrl = new URL(config.echo_endpoint);
-    var schema = endpointUrl.protocol;
-    http = require(schema === 'https:' ? 'https' : 'http');
+    var scheme = endpointUrl.protocol;
+    http = require(scheme === 'https:' ? 'https' : 'http');
   }
 
   /**
