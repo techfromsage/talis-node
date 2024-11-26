@@ -73,36 +73,6 @@ describe("Babel Node Client Test Suite", function(){
             headTargetFeed.should.throw("Missing Persona token");
         });
 
-        it.skip("- should return an error if call to request returns an error when head target feed", function(done){
-            var babel = rewire("../../index.js");
-
-            var babelClient = babel.createClient({
-                babel_host:"http://babel",
-                babel_port:3000
-            });
-            // var requestStub = function(options, callback){
-            //     options.headers.should.have.property('User-Agent', 'talis-node/0.2.3');
-            //     callback(new Error('Error communicating with Babel'));
-            // };
-
-            // babel.__set__("request", requestStub);
-
-            // TODO How does nock, mock unable to connect? Remove this test?
-            nock(endPoint)
-                .head('/feeds/targets/'+md5('TARGET')+'/activity/annotations')
-                .reply(function(uri, requestBody){
-                    this.req.headers['user-agent'].should.equal('talis-node/0.2.3');
-                    return [400];
-                });
-
-            babelClient.headTargetFeed('TARGET', 'secret', {}, function(err, response){
-
-                (err === null).should.be.false;
-                err.message.should.equal('Error communicating with Babel');
-                (typeof result).should.equal('undefined');
-                done();
-            });
-        });
         it("- should return an error (401) if persona token is invalid when head target feed", function(done){
             var babelClient = babel.createClient({
                 babel_host:"http://babel",
@@ -211,31 +181,6 @@ describe("Babel Node Client Test Suite", function(){
             babelClient.getEntireTargetFeed('target', null, null, function(err, result){
                 (err === undefined).should.be.false;
                 err.message.should.equal('Missing Persona token');
-                done();
-            });
-        });
-
-        it.skip("- should return an error if call to request returns an error when get target feed", function(done){
-            var babel = rewire("../../index.js");
-
-            // var babelClient = babel.createClient({
-            //     babel_host:"http://babel",
-            //     babel_port:3000
-            // });
-            // var requestStub = () => new Promise ((_resolve, reject) => reject(Error('Error communicating with Babel')))
-
-            // babel.__set__("rpn", requestStub);
-            // TODO How does nock, mock unable to connect? Remove this test?
-            nock(endPoint)
-                .get('/feeds/targets/'+md5('TARGET')+'/activity/annotations')
-                .reply(function(uri, requestBody){
-                    this.req.headers['user-agent'].should.equal('talis-node/0.2.3');
-                    return [404];
-                });
-
-            babelClient.getEntireTargetFeed('TARGET', 'secret', true, function(err, result){
-                (err === undefined).should.be.false;
-                err.message.should.equal('Error communicating with Babel');
                 done();
             });
         });
@@ -417,30 +362,6 @@ describe("Babel Node Client Test Suite", function(){
             });
         });
 
-        // TODO - remove - or how do we test tins in nock?
-        it.skip("- should return an error if call to request returns an error when get target feed", function(done){
-            var babel = rewire("../../index.js");
-
-            var babelClient = babel.createClient({
-                babel_host:"http://babel",
-                babel_port:3000
-            });
-            var requestStub = function(options, callback){
-                options.headers.should.have.property('User-Agent', 'talis-node/0.2.3');
-                callback(new Error('Error communicating with Babel'));
-            };
-
-            babel.__set__("request", requestStub);
-
-            babelClient.getTargetFeed('TARGET', 'secret', {}, function(err, result){
-
-                (err === null).should.be.false;
-                err.message.should.equal('Error communicating with Babel');
-                (typeof result).should.equal('undefined');
-                done();
-            });
-        });
-
         it("- should return an error (401) if persona token is invalid when get target feed", function(done){
             var babel = rewire("../../index.js");
 
@@ -606,39 +527,6 @@ describe("Babel Node Client Test Suite", function(){
             };
 
             getFeeds.should.throw("Missing Persona token");
-        });
-
-        // TODO - haw do we mock this in nock?
-        it.skip("- should return an error if call to request returns an error when get feeds", function(done){
-            var babel = rewire("../../index.js");
-
-            var babelClient = babel.createClient({
-                babel_host:"http://babel",
-                babel_port:3000
-            });
-            // var requestStub = function(options, callback){
-            //     options.headers.should.have.property('User-Agent', 'talis-node/0.2.3');
-            //     callback(new Error('Error communicating with Babel'));
-            // };
-
-            // babel.__set__("request", requestStub);
-            nock(endPoint)
-                .get('/feeds/annotations/hydrate')
-                .reply(function(uri, requestBody){
-                    this.req.headers['user-agent'].should.equal('talis-node/0.2.3');
-                    return [401, {
-                        error:"invalid_token",
-                        error_description:"The token is invalid or has expired"
-                    }];
-                });
-
-            babelClient.getFeeds(['FEED1'], 'secret', function(err, result){
-
-                (err === null).should.be.false;
-                err.message.should.equal('Error communicating with Babel');
-                (typeof result).should.equal('undefined');
-                done();
-            });
         });
 
         it("- should return an error (401) if persona token is invalid when get feeds", function(done){
@@ -824,40 +712,6 @@ describe("Babel Node Client Test Suite", function(){
             });
         });
 
-        // TODO - how do we mock this in nock?
-        it.skip("- should return an error if call to request returns an error", function(done){
-            var babel = rewire("../../index.js");
-
-            var babelClient = babel.createClient({
-                babel_host:"http://babel",
-                babel_port:3000
-            });
-            // var requestStub = function(options, callback){
-            //     options.headers.should.have.property('User-Agent', 'talis-node/0.2.3');
-            //     callback(new Error("Error communicating with Babel"));
-            // };
-
-            // babel.__set__("request", requestStub);
-
-            nock(endPoint)
-                .get('/annotations/id')
-                .reply(function(uri, requestBody){
-                    this.req.headers['user-agent'].should.equal('talis-node/0.2.3');
-                    return [404, {
-                        error:"feed_not_found",
-                        error_description:"Feed not found"
-                    }];
-                });
-
-            babelClient.getAnnotation("secret", "id", function(err, result){
-
-                (err === null).should.be.false;
-                err.message.should.equal("Error communicating with Babel");
-                (typeof result).should.equal("undefined");
-                done();
-            });
-        });
-
         it("- should return a single annotation if no error from babel", function(done){
             var babelClient = babel.createClient({
                 babel_host:"http://babel",
@@ -974,37 +828,6 @@ describe("Babel Node Client Test Suite", function(){
                 (err === null).should.be.false;
                 err.http_code.should.equal(401);
                 err.message.should.equal('The token is invalid or has expired');
-                (typeof result).should.equal('undefined');
-                done();
-            });
-        });
-
-        // TODO - how do we mock this in nock?
-        it.skip("- should return an error if call to request returns an error when annotations feed", function(done){
-            var babelClient = babel.createClient({
-                babel_host:"http://babel",
-                babel_port:3000
-            });
-            // var requestStub = function(options, callback){
-            //     options.headers.should.have.property('User-Agent', 'talis-node/0.2.3');
-            //     callback(new Error('Error communicating with Babel'));
-            // };
-
-            // babel.__set__("request", requestStub);
-            nock(endPoint)
-                .get('/annotations?' + querystring.stringify({}))
-                .reply(function(uri, requestBody){
-                    this.req.headers['user-agent'].should.equal('talis-node/0.2.3');
-                    return [401, {
-                        error:"invalid_token",
-                        error_description:"The token is invalid or has expired"
-                    }];
-                });
-
-            babelClient.getAnnotations('secret', {}, function(err, result){
-
-                (err === null).should.be.false;
-                err.message.should.equal('Error communicating with Babel');
                 (typeof result).should.equal('undefined');
                 done();
             });
@@ -1231,33 +1054,6 @@ describe("Babel Node Client Test Suite", function(){
                 );
                 (typeof result).should.equal('undefined');
 
-                done();
-            });
-        });
-
-        // TODO - how do we mock this in nock?
-        it.skip("- should return an error if call to request returns an error", function(done){
-            var babel = rewire("../../index.js");
-
-            var babelClient = babel.createClient({
-                babel_host:"http://babel",
-                babel_port:3000
-            });
-            // var requestStub = {
-            //     post:function(options, callback){
-            //         options.headers.should.have.property('User-Agent', 'talis-node/0.2.3');
-            //         var error = new Error('Error communicating with Babel');
-            //         callback(error);
-            //     }
-            // };
-
-            // babel.__set__("request", requestStub);
-
-            babelClient.createAnnotation('secret', {hasBody:{format:'text/plain', type:'Text'}, hasTarget:{uri:'http://example.com'}, annotatedBy:'Gordon Freeman'}, {}, function(err, result){
-
-                (err === null).should.be.false;
-                err.message.should.equal('Error communicating with Babel');
-                (typeof result).should.equal('undefined');
                 done();
             });
         });
@@ -1637,41 +1433,6 @@ describe("Babel Node Client Test Suite", function(){
             });
         });
 
-        // TODO - how do we mock this in nock?
-        it.skip("- should return an error if call to request returns an error", function(done){
-            var babel = rewire("../../index.js");
-
-            var babelClient = babel.createClient({
-                babel_host:"http://babel",
-                babel_port:3000
-            });
-            // var requestStub = {
-            //     put:function(options, callback){
-            //         options.headers.should.have.property('User-Agent', 'talis-node/0.2.3');
-            //         var error = new Error('Error communicating with Babel');
-            //         callback(error);
-            //     }
-            // };
-
-            // babel.__set__("request", requestStub);
-            nock(endPoint)
-                .post('/annotations')
-                .reply(function(uri, requestBody){
-                    this.req.headers['user-agent'].should.equal('talis-node/0.2.3');
-                    return [400, {
-                        body:"",
-                        message:"Bad Request"
-                    }];
-                });
-
-            babelClient.updateAnnotation('secret', {_id: 'testid', hasBody:{format:'text/plain', type:'Text'}, hasTarget:{uri:'http://example.com'}, annotatedBy:'Gordon Freeman'}, function(err, result){
-                (err === null).should.be.false;
-                err.message.should.equal('Error communicating with Babel');
-                (typeof result).should.equal('undefined');
-                done();
-            });
-        });
-
         it("- should return an error if call to request returns a none 200 response", function(done){
             var babel = rewire("../../index.js");
 
@@ -1804,40 +1565,6 @@ describe("Babel Node Client Test Suite", function(){
             };
 
             deleteAnnotation.should.throw("Missing annotationId");
-        });
-        // TODO - how do we mock this in nock?
-        it.skip("- should return an error if call to request returns an error", function(done){
-            var babel = rewire("../../index.js");
-
-            var babelClient = babel.createClient({
-                babel_host:"http://babel",
-                babel_port:3000
-            });
-            // var requestStub = {
-            //     delete:function(options, callback){
-            //         options.headers.should.have.property('User-Agent', 'talis-node/0.2.3');
-            //         var error = new Error('Error communicating with Babel');
-            //         callback(error);
-            //     }
-            // };
-
-            // babel.__set__("request", requestStub);
-            nock(endPoint)
-                .delete('/annotations/testid')
-                .reply(function(uri, requestBody){
-                    this.req.headers['user-agent'].should.equal('talis-node/0.2.3');
-                    return [400, {
-                        body:"",
-                        message:"Bad Request"
-                    }];
-                });
-
-            babelClient.deleteAnnotation('secret', 'testid', function(err, result){
-                (err === null).should.be.false;
-                err.message.should.equal('Error communicating with Babel');
-                (typeof result).should.equal('undefined');
-                done();
-            });
         });
         it("- should return an error if call to babel returns an error", function(done){
             var babel = rewire("../../index.js");

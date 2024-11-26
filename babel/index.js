@@ -588,21 +588,9 @@ BabelClient.prototype.createAnnotation = function createAnnotation(token, data, 
 
       resp.on("end", d => {
         if (parseInt(resp.statusCode / 100) !== 2) {
-            // var babelError = new Error('Error creating annotation: ' + JSON.stringify(body));
             var babelError = new Error('Error creating annotation: ' + body);
             babelError.http_code = resp && resp.statusCode ? resp.statusCode : 404;
             callback(babelError);
-
-            // var babelError = new Error();
-            // var bodyObject = JSON.parse(body);
-            // var errorDescription = bodyObject.error_description ? bodyObject.error_description : bodyObject.message;
-            // try {
-            //     babelError.message = errorDescription;
-            // } catch (e) {
-            //     babelError.message = body;
-            // }
-            // babelError.http_code = resp && resp.statusCode ? resp.statusCode : 404;
-            // callback(babelError);
         } else {
           callback(null, JSON.parse(body));
           return;
